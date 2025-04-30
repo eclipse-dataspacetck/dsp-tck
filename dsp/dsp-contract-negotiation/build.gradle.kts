@@ -1,5 +1,3 @@
-import org.eclipse.dataspacetck.gradle.plugins.tckgen.TckGeneratorExtension
-
 /*
  *  Copyright (c) 2023 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
  *

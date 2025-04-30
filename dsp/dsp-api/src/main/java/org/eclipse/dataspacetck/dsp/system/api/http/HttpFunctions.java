@@ -33,11 +33,14 @@ import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.serial
 public class HttpFunctions {
     private static Interceptor authorizationInterceptor = chain -> chain.proceed(chain.request());
 
+    private HttpFunctions() {
+    }
+
     public static void registerAuthorizationInterceptor(String authorizationHeader) {
         authorizationInterceptor = chain -> {
             var request = chain.request();
             var authenticatedRequest = request.newBuilder()
-                            .header("Authorization", authorizationHeader).build();
+                    .header("Authorization", authorizationHeader).build();
             return chain.proceed(authenticatedRequest);
         };
     }
@@ -67,6 +70,8 @@ public class HttpFunctions {
                 if (response.code() < 400 || response.code() >= 500 || !expectError) {
                     throw new AssertionError("Unexpected response code: " + response.code());
                 }
+            } else if (expectError) {
+                throw new AssertionError("Expected to throw an error on request: " + url);
             }
             return response;
         } catch (IOException e) {
@@ -92,8 +97,5 @@ public class HttpFunctions {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private HttpFunctions() {
     }
 }

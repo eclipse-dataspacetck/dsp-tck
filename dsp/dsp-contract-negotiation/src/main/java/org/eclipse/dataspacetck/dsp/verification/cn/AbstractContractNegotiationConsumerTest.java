@@ -16,7 +16,6 @@
 package org.eclipse.dataspacetck.dsp.verification.cn;
 
 import org.eclipse.dataspacetck.core.api.system.Inject;
-import org.eclipse.dataspacetck.core.api.verification.AbstractVerificationTest;
 import org.eclipse.dataspacetck.dsp.system.api.connector.Connector;
 import org.eclipse.dataspacetck.dsp.system.api.connector.Provider;
 import org.eclipse.dataspacetck.dsp.system.api.mock.ConsumerNegotiationMock;
@@ -27,7 +26,7 @@ import org.junit.jupiter.api.Tag;
  * Base class for verifying a connector in the consumer role.
  */
 @Tag("dsp-cn")
-public abstract class AbstractContractNegotiationConsumerTest extends AbstractVerificationTest {
+public abstract class AbstractContractNegotiationConsumerTest extends AbstractContractNegotiationTest {
 
     @Inject
     @Provider

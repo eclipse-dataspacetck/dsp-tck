@@ -4,14 +4,14 @@ A DSP TCK runtime that performs compatibility tests against a running connector 
 
 DockerHub: <https://hub.docker.com/r/eclipsedataspacetck/dsp-tck-runtime>
 
-Eclipse Tractus-X product(s) installed within the image:
+Eclipse Dataspace TCK product(s) installed within the image:
 
-## Tractus-X EDC Control Plane
+## Dataspace DSP TCK
 
 - GitHub: <https://github.com/eclipse-dataspacetck/dsp-tck>
 - Project home: <https://projects.eclipse.org/projects/technology.dataspacetck>
 - Dockerfile: <https://github.com/eclipse-dataspacetck/dsp-tck/blob/main/dsp/dsp-tck/src/main/docker/Dockerfile>
-- Project license: [Apache License, Version 2.0](https://github.com/eclipse-tractusx/tractusx-edc/blob/main/LICENSE)
+- Project license: [Apache License, Version 2.0](https://github.com/eclipse-dataspacetck/dsp-tck/blob/main/LICENSE.md)
 
 ## Used base image
 

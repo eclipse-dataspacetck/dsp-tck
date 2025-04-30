@@ -24,8 +24,13 @@ import org.eclipse.dataspacetck.dsp.system.api.connector.ProviderNegotiationMana
  * Implements a simple, in-memory connector that supports control-plane operations for testing.
  */
 public class TckConnector implements Connector {
-    private ProviderNegotiationManager providerNegotiationManager;
-    private ConsumerNegotiationManager consumerNegotiationManager;
+    private final ProviderNegotiationManager providerNegotiationManager;
+    private final ConsumerNegotiationManager consumerNegotiationManager;
+
+    public TckConnector(Monitor monitor) {
+        consumerNegotiationManager = new ConsumerNegotiationManagerImpl(monitor);
+        providerNegotiationManager = new ProviderNegotiationManagerImpl();
+    }
 
     public ProviderNegotiationManager getProviderNegotiationManager() {
         return providerNegotiationManager;
@@ -33,10 +38,5 @@ public class TckConnector implements Connector {
 
     public ConsumerNegotiationManager getConsumerNegotiationManager() {
         return consumerNegotiationManager;
-    }
-
-    public TckConnector(Monitor monitor) {
-        consumerNegotiationManager = new ConsumerNegotiationManagerImpl(monitor);
-        providerNegotiationManager = new ProviderNegotiationManagerImpl();
     }
 }

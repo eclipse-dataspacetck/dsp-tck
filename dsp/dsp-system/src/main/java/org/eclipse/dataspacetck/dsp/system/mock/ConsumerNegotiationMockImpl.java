@@ -32,8 +32,8 @@ import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegot
  * Default mock consumer implementation.
  */
 public class ConsumerNegotiationMockImpl extends AbstractNegotiationMock implements ConsumerNegotiationMock, NegotiationListener {
-    private ConsumerNegotiationManager manager;
-    private String baseAddress;
+    private final ConsumerNegotiationManager manager;
+    private final String baseAddress;
 
     public ConsumerNegotiationMockImpl(ConsumerNegotiationManager manager, Executor executor, String baseAddress) {
         super(executor);

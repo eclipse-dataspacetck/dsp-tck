@@ -60,13 +60,12 @@ public class SystemBootstrapExtension implements BeforeAllCallback,
     private static final ExtensionContext.Namespace CALLBACK_NAMESPACE = org.junit.jupiter.api.extension.ExtensionContext.Namespace.create(new Object());
 
     private static boolean started;
-
-    private String callbackHost;
-    private int callbackPort;
     private static SystemLauncher launcher;
     private static DispatchingHandler dispatchingHandler;
     private static HttpServer server;
     private static ConsoleMonitor monitor;
+    private String callbackHost;
+    private int callbackPort;
     private ExecutorService executorService;
 
     @Override
@@ -243,6 +242,7 @@ public class SystemBootstrapExtension implements BeforeAllCallback,
                     var response = endpoint.apply(path, exchange.getRequestHeaders(), exchange.getRequestBody());
                     if (response.result() == null) {
                         exchange.sendResponseHeaders(response.code(), 0);
+                        exchange.close();
                     } else {
                         var bytes = response.result().getBytes();
                         exchange.sendResponseHeaders(response.code(), bytes.length);
@@ -254,6 +254,7 @@ public class SystemBootstrapExtension implements BeforeAllCallback,
                 }
             }
             exchange.sendResponseHeaders(404, 0);
+            exchange.close();
         }
     }
 

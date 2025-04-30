@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
@@ -41,7 +40,6 @@ public abstract class AbstractAsyncPipeline<P extends AsyncPipeline<P>> implemen
     protected CallbackEndpoint endpoint;
     protected Monitor monitor;
     protected long waitTime;
-    protected Supplier<Map<String, Object>> context;
 
     protected List<Runnable> stages = new ArrayList<>();
 
@@ -65,11 +63,10 @@ public abstract class AbstractAsyncPipeline<P extends AsyncPipeline<P>> implemen
      */
     protected Deque<CountDownLatch> expectLatches = new ArrayDeque<>();
 
-    public AbstractAsyncPipeline(CallbackEndpoint endpoint, Monitor monitor, long waitTime, Supplier<Map<String, Object>> context) {
+    public AbstractAsyncPipeline(CallbackEndpoint endpoint, Monitor monitor, long waitTime) {
         this.endpoint = endpoint;
         this.waitTime = waitTime;
         this.monitor = monitor;
-        this.context = context;
     }
 
     public P thenWait(String description, Callable<Boolean> condition) {
@@ -111,7 +108,7 @@ public abstract class AbstractAsyncPipeline<P extends AsyncPipeline<P>> implemen
         expectLatches.add(latch);
         stages.add(() ->
                 endpoint.registerHandler(path, agreement -> {
-                    action.accept((MessageSerializer.processJsonLd(agreement, context.get())));
+                    action.accept((MessageSerializer.processJsonLd(agreement)));
                     endpoint.deregisterHandler(path);
                     latch.countDown();
                     return null;

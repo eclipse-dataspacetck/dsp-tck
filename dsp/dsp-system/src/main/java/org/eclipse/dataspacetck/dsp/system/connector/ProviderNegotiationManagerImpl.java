@@ -16,7 +16,6 @@
 package org.eclipse.dataspacetck.dsp.system.connector;
 
 import org.eclipse.dataspacetck.dsp.system.api.connector.ProviderNegotiationManager;
-import org.eclipse.dataspacetck.dsp.system.api.metadata.DcpSpecBug;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation;
 import org.jetbrains.annotations.NotNull;
 
@@ -77,20 +76,20 @@ public class ProviderNegotiationManagerImpl extends AbstractNegotiationManager i
             // the message is an initial request
             negotiation = handleInitialRequest(contractRequest, counterPartyId);
         }
-        return createNegotiationResponse(negotiation.getId(), negotiation.getCorrelationId(), negotiation.getState().toString().toLowerCase());
+        return createNegotiationResponse(negotiation.getId(), negotiation.getCorrelationId(), negotiation.getState().toString());
     }
 
     @Override
     public void handleAccepted(Map<String, Object> event) {
-        var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, event); // // FIXME https://github.com/eclipse-dataspacetck/cvf/issues/92
-        stringProperty(DSPACE_PROPERTY_EVENT_TYPE_EXPANDED, event);
+        var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, event);
+        stringIdProperty(DSPACE_PROPERTY_EVENT_TYPE_EXPANDED, event);
         var negotiation = negotiations.get(providerId);
         negotiation.transition(ACCEPTED, n -> listeners.forEach(l -> l.agreed(negotiation)));
     }
 
     @Override
     public void handleVerified(Map<String, Object> verification) {
-        var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, verification); // FIXME https://github.com/eclipse-dataspacetck/cvf/issues/92
+        var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, verification);
         var negotiation = findById(providerId);
         // TODO verify message
         negotiation.transition(VERIFIED, n -> listeners.forEach(l -> l.verified(n)));
@@ -113,9 +112,8 @@ public class ProviderNegotiationManagerImpl extends AbstractNegotiationManager i
 
     @NotNull
     private ContractNegotiation handleInitialRequest(Map<String, Object> contractRequest, String counterPartyId) {
-        @DcpSpecBug(section = "Json-LD context", description = "https://github.com/eclipse-dataspacetck/cvf/issues/92")
-        var consumerId = stringIdProperty(DSPACE_PROPERTY_CONSUMER_PID_EXPANDED, contractRequest);
-        var previousNegotiation = findByCorrelationId(consumerId);
+        var consumerPid = stringIdProperty(DSPACE_PROPERTY_CONSUMER_PID_EXPANDED, contractRequest);
+        var previousNegotiation = findByCorrelationId(consumerPid);
         if (previousNegotiation != null) {
             return previousNegotiation;
         }
@@ -126,7 +124,7 @@ public class ProviderNegotiationManagerImpl extends AbstractNegotiationManager i
         var callbackAddress = stringProperty(DSPACE_PROPERTY_CALLBACK_ADDRESS_EXPANDED, contractRequest);
 
         var negotiation = ContractNegotiation.Builder.newInstance()
-                .correlationId(consumerId)
+                .correlationId(consumerPid)
                 .offerId(offerId)
                 .datasetId(datasetIdFromOfferId(offerId))
                 .state(REQUESTED)

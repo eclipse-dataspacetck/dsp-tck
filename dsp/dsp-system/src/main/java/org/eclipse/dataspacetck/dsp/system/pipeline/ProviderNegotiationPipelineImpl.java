@@ -37,7 +37,6 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.TCK_P
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createAcceptedEvent;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createContractRequest;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createCounterOffer;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createDspContext;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createTermination;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createVerification;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.stringIdProperty;
@@ -53,9 +52,9 @@ public class ProviderNegotiationPipelineImpl extends AbstractNegotiationPipeline
     private static final String NEGOTIATIONS_TERMINATION_PATH = "/negotiations/[^/]+/termination/";
     private static final String NEGOTIATION_EVENT_PATH = "/negotiations/[^/]+/events";
 
-    private Connector consumerConnector;
-    private String providerConnectorId;
-    private ProviderNegotiationClient negotiationClient;
+    private final Connector consumerConnector;
+    private final String providerConnectorId;
+    private final ProviderNegotiationClient negotiationClient;
 
     public ProviderNegotiationPipelineImpl(ProviderNegotiationClient negotiationClient,
                                            CallbackEndpoint endpoint,
@@ -79,7 +78,7 @@ public class ProviderNegotiationPipelineImpl extends AbstractNegotiationPipeline
 
             monitor.debug("Sending contract request");
             var response = negotiationClient.contractRequest(contractRequest, providerConnectorId, false);
-            var correlationId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, response); // FIXME https://github.com/eclipse-dataspacetck/cvf/issues/92
+            var correlationId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, response);
             consumerConnector.getConsumerNegotiationManager().contractRequested(providerNegotiation.getId(), correlationId);
         });
         return this;
@@ -165,7 +164,7 @@ public class ProviderNegotiationPipelineImpl extends AbstractNegotiationPipeline
         expectLatches.add(latch);
         stages.add(() ->
                 endpoint.registerHandler(NEGOTIATIONS_OFFER_PATH, offer -> {
-                    var negotiation = action.apply((processJsonLd(offer, createDspContext())));
+                    var negotiation = action.apply((processJsonLd(offer)));
                     endpoint.deregisterHandler(NEGOTIATIONS_OFFER_PATH);
                     latch.countDown();
                     return serialize(negotiation);

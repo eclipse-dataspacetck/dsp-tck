@@ -30,7 +30,7 @@ import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegot
  * Default mock provider implementation.
  */
 public class ProviderNegotiationMockImpl extends AbstractNegotiationMock implements ProviderNegotiationMock, NegotiationListener {
-    private ProviderNegotiationManager manager;
+    private final ProviderNegotiationManager manager;
 
     public ProviderNegotiationMockImpl(ProviderNegotiationManager manager, Executor executor) {
         super(executor);

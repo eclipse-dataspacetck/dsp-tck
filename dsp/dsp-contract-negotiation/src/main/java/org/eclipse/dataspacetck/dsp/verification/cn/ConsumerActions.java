@@ -23,7 +23,6 @@ import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.postJso
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_PROVIDER_PID_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createAcceptedEvent;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createContractRequest;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createDspContext;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createVerification;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.stringIdProperty;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State.ACCEPTED;
@@ -38,6 +37,9 @@ public class ConsumerActions {
     private static final String REQUEST_PATH = "%s/negotiations/request";
     private static final String VERIFICATION_PATH = "%s/negotiations/%s/agreement/verification";
 
+    private ConsumerActions() {
+    }
+
     public static void postRequest(String baseUrl, ContractNegotiation negotiation) {
         var url = format(REQUEST_PATH, baseUrl);
         var contractRequest = createContractRequest(negotiation.getId(), negotiation.getOfferId(), negotiation.getDatasetId(), baseUrl);
@@ -45,8 +47,8 @@ public class ConsumerActions {
             // get the response and update the negotiation with the provider process id
             checkResponse(response);
             assert response.body() != null;
-            var jsonResponse = processJsonLd(response.body().byteStream(), createDspContext());
-            var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, jsonResponse); // FIXME https://github.com/eclipse-dataspacetck/cvf/issues/92
+            var jsonResponse = processJsonLd(response.body().byteStream());
+            var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, jsonResponse);
             negotiation.setCorrelationId(providerId, REQUESTED);
         }
     }
@@ -73,9 +75,6 @@ public class ConsumerActions {
         if (!response.isSuccessful()) {
             throw new AssertionError("Unexpected response code: " + response.code());
         }
-    }
-
-    private ConsumerActions() {
     }
 
 }

@@ -31,9 +31,8 @@ import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.CONTEXT;
-import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_NAMESPACE;
-import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_NAMESPACE_KEY;
-import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_NAMESPACE_PREFIX;
+import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_CONTEXT;
+import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_AGREEMENT;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_CALLBACK_ADDRESS;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_CODE;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_CONSUMER_PID;
@@ -47,8 +46,6 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.ID;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.TYPE;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.VALUE;
 import static org.eclipse.dataspacetck.dsp.system.api.message.OdrlConstants.ODRL_AGREEMENT_TYPE;
-import static org.eclipse.dataspacetck.dsp.system.api.message.OdrlConstants.ODRL_NAMESPACE;
-import static org.eclipse.dataspacetck.dsp.system.api.message.OdrlConstants.ODRL_NAMESPACE_KEY;
 import static org.eclipse.dataspacetck.dsp.system.api.message.OdrlConstants.ODRL_OFFER_TYPE;
 import static org.eclipse.dataspacetck.dsp.system.api.message.OdrlConstants.ODRL_PROPERTY_ACTION;
 import static org.eclipse.dataspacetck.dsp.system.api.message.OdrlConstants.ODRL_PROPERTY_ASSIGNEE;
@@ -65,8 +62,11 @@ public class MessageFunctions {
     private static final Map<String, String> IDENTITY_TYPE = Map.of("@type", "@id");
 
 
+    private MessageFunctions() {
+    }
+
     public static Map<String, Object> createTermination(String providerId, String consumerId, String code, String... reasons) {
-        var message = createBaseMessage(DSPACE_NAMESPACE_PREFIX + "ContractNegotiationTerminationMessage");
+        var message = createBaseMessage("ContractNegotiationTerminationMessage");
         message.put(CONTEXT, createDspContext());
 
         message.put(DSPACE_PROPERTY_PROVIDER_PID, providerId);
@@ -88,17 +88,17 @@ public class MessageFunctions {
     }
 
     public static Map<String, Object> createEvent(String providerId, String consumerId, String eventType) {
-        var message = createBaseMessage(DSPACE_NAMESPACE_PREFIX + "ContractNegotiationEventMessage");
+        var message = createBaseMessage("ContractNegotiationEventMessage");
         message.put(CONTEXT, createDspContext());
         message.put(DSPACE_PROPERTY_PROVIDER_PID, providerId);
         message.put(DSPACE_PROPERTY_CONSUMER_PID, consumerId);
 
-        message.put(DSPACE_PROPERTY_EVENT_TYPE, DSPACE_NAMESPACE + eventType);
+        message.put(DSPACE_PROPERTY_EVENT_TYPE, eventType);
         return message;
     }
 
     public static Map<String, Object> createContractRequest(String consumerPid, String offerId, String targetId, String callbackAddress) {
-        var message = createBaseMessage(DSPACE_NAMESPACE_PREFIX + "ContractRequestMessage");
+        var message = createBaseMessage("ContractRequestMessage");
         message.put(CONTEXT, createDspContext());
         message.put(DSPACE_PROPERTY_CONSUMER_PID, consumerPid);
 
@@ -106,7 +106,9 @@ public class MessageFunctions {
         var offer = new LinkedHashMap<String, Object>();
         offer.put(ID, offerId);
         offer.put(ODRL_PROPERTY_TARGET, targetId);
-        offer.put(TYPE, ODRL_NAMESPACE + "Offer");    // WORKAROUND: REMOVE - @type
+        offer.put(TYPE, ODRL_OFFER_TYPE);    // WORKAROUND: REMOVE - @type
+        var permissions = Map.of(ODRL_PROPERTY_ACTION, ODRL_USE, ODRL_PROPERTY_CONSTRAINTS, emptyList());
+        offer.put(ODRL_PROPERTY_PERMISSION, List.of(permissions));
 
         message.put(DSPACE_PROPERTY_OFFER, offer);
 
@@ -122,7 +124,7 @@ public class MessageFunctions {
                                                          String assignee,
                                                          String targetId,
                                                          String callbackAddress) {
-        var message = createBaseMessage(DSPACE_NAMESPACE_PREFIX + "ContractRequestMessage"); // do NOT override id
+        var message = createBaseMessage("ContractRequestMessage"); // do NOT override id
         message.put(CONTEXT, createDspContext());
         message.put(DSPACE_PROPERTY_PROVIDER_PID, providerId);
         message.put(DSPACE_PROPERTY_CONSUMER_PID, consumerId);
@@ -134,7 +136,7 @@ public class MessageFunctions {
     }
 
     public static Map<String, Object> createVerification(String providerId, String consumerId) {
-        var message = createBaseMessage(DSPACE_NAMESPACE_PREFIX + "ContractAgreementVerificationMessage");
+        var message = createBaseMessage("ContractAgreementVerificationMessage");
         message.put(CONTEXT, createDspContext());
 
         message.put(DSPACE_PROPERTY_PROVIDER_PID, providerId);
@@ -149,7 +151,7 @@ public class MessageFunctions {
                                                   String assignee,
                                                   String targetId,
                                                   String callbackAddress) {
-        var message = createBaseMessage(DSPACE_NAMESPACE_PREFIX + "ContractOfferMessage");
+        var message = createBaseMessage("ContractOfferMessage");
         var context = createDspContext();
         message.put(CONTEXT, context);
         message.put(DSPACE_PROPERTY_PROVIDER_PID, providerId);
@@ -186,8 +188,9 @@ public class MessageFunctions {
                                                       String agreementId,
                                                       String assigner,
                                                       String assignee,
-                                                      String targetId) {
-        var message = createBaseMessage(DSPACE_NAMESPACE_PREFIX + "ContractAgreementMessage");
+                                                      String targetId,
+                                                      String callbackAddress) {
+        var message = createBaseMessage("ContractAgreementMessage");
         var context = createDspContext();
         message.put(CONTEXT, context);
         message.put(DSPACE_PROPERTY_PROVIDER_PID, providerId);
@@ -203,13 +206,14 @@ public class MessageFunctions {
         offer.put(ODRL_PROPERTY_ASSIGNEE, assignee);
         offer.put(ODRL_PROPERTY_ASSIGNER, assigner);
 
-        message.put(DSPACE_NAMESPACE_PREFIX + "agreement", offer);
+        message.put(DSPACE_PROPERTY_AGREEMENT, offer);
+        message.put(DSPACE_PROPERTY_CALLBACK_ADDRESS, callbackAddress);
 
         return message;
     }
 
     public static Map<String, Object> createNegotiationResponse(String providerPid, String consumerPid, String state) {
-        var message = createBaseMessage(DSPACE_NAMESPACE_PREFIX + "ContractNegotiation");
+        var message = createBaseMessage("ContractNegotiation");
         var context = createDspContext();
         message.put(CONTEXT, context);
         message.put(DSPACE_PROPERTY_PROVIDER_PID, providerPid);
@@ -277,16 +281,8 @@ public class MessageFunctions {
         throw new AssertionError(format("Property '%s' was not in expanded @id form", key));
     }
 
-    public static Map<String, Object> createDspContext() {
-        var context = new LinkedHashMap<String, Object>();
-        context.put(DSPACE_NAMESPACE_KEY, DSPACE_NAMESPACE);
-        context.put(ODRL_NAMESPACE_KEY, ODRL_NAMESPACE);
-        context.put("target", "odrl:target");
-        context.put("odrl:target", IDENTITY_TYPE);
-        context.put(DSPACE_NAMESPACE_PREFIX + "state", IDENTITY_TYPE);
-        context.put(DSPACE_NAMESPACE_PREFIX + "consumerPid", IDENTITY_TYPE);
-        context.put(DSPACE_NAMESPACE_PREFIX + "providerPid", IDENTITY_TYPE);
-        return context;
+    public static List<String> createDspContext() {
+        return List.of(DSPACE_CONTEXT);
     }
 
     @NotNull
@@ -295,9 +291,6 @@ public class MessageFunctions {
         message.put(ID, UUID.randomUUID().toString());
         message.put(TYPE, type);
         return message;
-    }
-
-    private MessageFunctions() {
     }
 
 }

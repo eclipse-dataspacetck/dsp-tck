@@ -24,11 +24,9 @@ import static java.lang.String.format;
 import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.processJsonLd;
 import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.getJson;
 import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.postJson;
-import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_NAMESPACE;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_PROVIDER_PID_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.TCK_PARTICIPANT_ID;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createDspContext;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createNegotiationResponse;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.stringIdProperty;
 
@@ -39,15 +37,14 @@ public class ConsumerNegotiationClientImpl implements ConsumerNegotiationClient 
     private static final String GET_PATH = "%s/negotiations/%s";
 
     @DspTestingWorkaround("Should be %s/negotiations/%s/offers")
-    private static final String OFFERS_PATH = "%s/negotiations/%s/offer";
+    private static final String OFFERS_PATH = "%s/negotiations/%s/offers";
     private static final String AGREEMENTS_PATH = "%s/negotiations/%s/agreement";
     private static final String FINALIZE_PATH = "%s/negotiations/%s/events";
-
+    private final Monitor monitor;
     private String consumerConnectorInitiateUrl;
     private Connector systemConsumerConnector;
     private Connector providerConnector;
     private String providerConnectorBaseUrl;
-    private Monitor monitor;
 
     public ConsumerNegotiationClientImpl(String consumerConnectorInitiateUrl,
                                          Connector providerConnector,
@@ -72,7 +69,7 @@ public class ConsumerNegotiationClientImpl implements ConsumerNegotiationClient 
         if (systemConsumerConnector != null) {
             systemConsumerConnector.getConsumerNegotiationManager().createNegotiation(datasetId, offerId);
         } else {
-            var request = Map.of("providerId", TCK_PARTICIPANT_ID, "offerId", offerId, "connectorAddress", providerConnectorBaseUrl);
+            var request = Map.of("providerId", TCK_PARTICIPANT_ID, "offerId", offerId, "datasetId", datasetId, "connectorAddress", providerConnectorBaseUrl);
             try (var response = postJson(consumerConnectorInitiateUrl, request, false, true)) {
                 monitor.debug("Received contract request response");
             }
@@ -81,7 +78,7 @@ public class ConsumerNegotiationClientImpl implements ConsumerNegotiationClient 
 
     @Override
     public void contractOffer(String consumerId, Map<String, Object> offer, String callbackAddress, boolean expectError) {
-        var compacted = processJsonLd(offer, createDspContext());
+        var compacted = processJsonLd(offer);
         if (systemConsumerConnector != null) {
             systemConsumerConnector.getConsumerNegotiationManager().handleOffer(compacted);
         } else {
@@ -95,7 +92,7 @@ public class ConsumerNegotiationClientImpl implements ConsumerNegotiationClient 
 
     @Override
     public void contractAgreement(String consumerId, Map<String, Object> agreement, String callbackAddress) {
-        var compacted = processJsonLd(agreement, createDspContext());
+        var compacted = processJsonLd(agreement);
         if (systemConsumerConnector != null) {
             systemConsumerConnector.getConsumerNegotiationManager().handleAgreement(compacted);
         } else {
@@ -109,7 +106,7 @@ public class ConsumerNegotiationClientImpl implements ConsumerNegotiationClient 
 
     @Override
     public void finalize(String consumerId, Map<String, Object> event, String callbackAddress, boolean expectError) {
-        var compacted = processJsonLd(event, createDspContext());
+        var compacted = processJsonLd(event);
         if (systemConsumerConnector != null) {
             systemConsumerConnector.getConsumerNegotiationManager().handleFinalized(compacted);
         } else {
@@ -126,14 +123,13 @@ public class ConsumerNegotiationClientImpl implements ConsumerNegotiationClient 
         if (systemConsumerConnector != null) {
             var negotiation = systemConsumerConnector.getConsumerNegotiationManager().findById(consumerId);
             var consumerPid = negotiation.getCorrelationId();
-            var state = DSPACE_NAMESPACE + negotiation.getState().toString();
-            return processJsonLd(createNegotiationResponse(consumerId, consumerPid, state), createDspContext());
+            return processJsonLd(createNegotiationResponse(consumerId, consumerPid, negotiation.getState().toString()));
         } else {
             try (var response = getJson(format(GET_PATH, callbackAddress, consumerId))) {
                 //noinspection DataFlowIssue
-                var jsonResponse = processJsonLd(response.body().byteStream(), createDspContext());
-                var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, jsonResponse); // FIXME https://github.com/eclipse-dataspacetck/cvf/issues/92
-                var state = stringIdProperty(DSPACE_PROPERTY_STATE_EXPANDED, jsonResponse); // FIXME https://github.com/eclipse-dataspacetck/cvf/issues/92
+                var jsonResponse = processJsonLd(response.body().byteStream());
+                var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, jsonResponse);
+                var state = stringIdProperty(DSPACE_PROPERTY_STATE_EXPANDED, jsonResponse);
                 monitor.debug(format("Received negotiation status response with state %s: %s", state, providerId));
                 return jsonResponse;
             }

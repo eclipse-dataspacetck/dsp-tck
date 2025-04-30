@@ -16,7 +16,6 @@ package org.eclipse.dataspacetck.dsp.system.pipeline;
 import org.eclipse.dataspacetck.core.api.pipeline.AbstractAsyncPipeline;
 import org.eclipse.dataspacetck.core.api.system.CallbackEndpoint;
 import org.eclipse.dataspacetck.core.spi.boot.Monitor;
-import org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions;
 import org.eclipse.dataspacetck.dsp.system.api.pipeline.NegotiationPipeline;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation;
 
@@ -27,7 +26,7 @@ public abstract class AbstractNegotiationPipeline<P extends NegotiationPipeline<
     protected ContractNegotiation providerNegotiation;
 
     public AbstractNegotiationPipeline(CallbackEndpoint endpoint, Monitor monitor, long waitTime) {
-        super(endpoint, monitor, waitTime, MessageFunctions::createDspContext);
+        super(endpoint, monitor, waitTime);
     }
 
     public P thenWaitForState(ContractNegotiation.State state) {

@@ -17,7 +17,6 @@ package org.eclipse.dataspacetck.dsp.verification.cn;
 
 import org.eclipse.dataspacetck.core.api.system.ConfigParam;
 import org.eclipse.dataspacetck.core.api.system.Inject;
-import org.eclipse.dataspacetck.core.api.verification.AbstractVerificationTest;
 import org.eclipse.dataspacetck.dsp.system.api.connector.Connector;
 import org.eclipse.dataspacetck.dsp.system.api.connector.Consumer;
 import org.eclipse.dataspacetck.dsp.system.api.mock.ProviderNegotiationMock;
@@ -31,7 +30,7 @@ import static org.eclipse.dataspacetck.dsp.system.api.connector.IdGenerator.OFFE
  * Base class for verifying a connector in the provider role.
  */
 @Tag("dsp-cn")
-public abstract class AbstractContractNegotiationProviderTest extends AbstractVerificationTest {
+public abstract class AbstractContractNegotiationProviderTest extends AbstractContractNegotiationTest {
 
     @Inject
     @Consumer

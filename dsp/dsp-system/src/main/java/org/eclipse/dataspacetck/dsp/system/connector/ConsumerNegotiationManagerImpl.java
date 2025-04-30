@@ -35,7 +35,7 @@ import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegot
  * Manages contract negotiations on a consumer.
  */
 public class ConsumerNegotiationManagerImpl extends AbstractNegotiationManager implements ConsumerNegotiationManager {
-    private Monitor monitor;
+    private final Monitor monitor;
 
     public ConsumerNegotiationManagerImpl(Monitor monitor) {
         this.monitor = monitor;
@@ -85,28 +85,28 @@ public class ConsumerNegotiationManagerImpl extends AbstractNegotiationManager i
 
     @Override
     public Map<String, Object> handleOffer(Map<String, Object> offer) {
-        var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, offer); // FIXME https://github.com/eclipse-dataspacetck/cvf/issues/92
+        var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, offer);
         monitor.debug("Received provider offer: " + providerId);
-        var consumerId = stringIdProperty(DSPACE_PROPERTY_CONSUMER_PID_EXPANDED, offer); // FIXME https://github.com/eclipse-dataspacetck/cvf/issues/92
+        var consumerId = stringIdProperty(DSPACE_PROPERTY_CONSUMER_PID_EXPANDED, offer);
         var negotiation = findById(consumerId);
         negotiation.storeOffer(offer, OFFERED, n -> listeners.forEach(l -> l.offered(negotiation)));
-        return createNegotiationResponse(negotiation.getCorrelationId(), negotiation.getId(), OFFERED.toString().toLowerCase());
+        return createNegotiationResponse(negotiation.getCorrelationId(), negotiation.getId(), OFFERED.toString());
     }
 
     @Override
     public void handleAgreement(Map<String, Object> agreement) {
-        var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, agreement); // FIXME https://github.com/eclipse-dataspacetck/cvf/issues/92
+        var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, agreement);
         monitor.debug("Received provider agreement: " + providerId);
-        var consumerId = stringIdProperty(DSPACE_PROPERTY_CONSUMER_PID_EXPANDED, agreement); // // FIXME https://github.com/eclipse-dataspacetck/cvf/issues/92
+        var consumerId = stringIdProperty(DSPACE_PROPERTY_CONSUMER_PID_EXPANDED, agreement);
         var negotiation = findById(consumerId);
         negotiation.storeAgreement(agreement, n -> listeners.forEach(l -> l.agreed(negotiation)));
     }
 
     @Override
     public void handleFinalized(Map<String, Object> event) {
-        var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, event); // FIXME https://github.com/eclipse-dataspacetck/cvf/issues/92
+        var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, event);
         monitor.debug("Received provider finalize: " + providerId);
-        var consumerId = stringIdProperty(DSPACE_PROPERTY_CONSUMER_PID_EXPANDED, event); // FIXME https://github.com/eclipse-dataspacetck/cvf/issues/92
+        var consumerId = stringIdProperty(DSPACE_PROPERTY_CONSUMER_PID_EXPANDED, event);
         var negotiation = findById(consumerId);
         negotiation.transition(ContractNegotiation.State.FINALIZED, n -> listeners.forEach(l -> l.finalized(negotiation)));
     }

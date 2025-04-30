@@ -36,7 +36,6 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPAC
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.TCK_PARTICIPANT_ID;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createAgreement;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createDspContext;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createFinalizedEvent;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createOffer;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.stringIdProperty;
@@ -50,10 +49,10 @@ public class ConsumerNegotiationPipelineImpl extends AbstractNegotiationPipeline
     private static final String NEGOTIATION_EVENT_PATH = "/negotiations/[^/]+/events";
     private static final String VERIFICATION_PATH = "/negotiations/[^/]+/agreement/verification";
 
-    private ConsumerNegotiationClient negotiationClient;
-    private Connector providerConnector;
-    private CallbackEndpoint endpoint;
-    private String consumerConnectorId;
+    private final ConsumerNegotiationClient negotiationClient;
+    private final Connector providerConnector;
+    private final CallbackEndpoint endpoint;
+    private final String consumerConnectorId;
 
     public ConsumerNegotiationPipelineImpl(ConsumerNegotiationClient negotiationClient,
                                            CallbackEndpoint endpoint,
@@ -114,7 +113,8 @@ public class ConsumerNegotiationPipelineImpl extends AbstractNegotiationPipeline
                     agreementId,
                     TCK_PARTICIPANT_ID,
                     consumerConnectorId,
-                    datasetId);
+                    datasetId,
+                    endpoint.getAddress());
             var callbackAddress = providerNegotiation.getCallbackAddress();
             monitor.debug("Sending agreement");
             negotiationClient.contractAgreement(consumerId, agreement, callbackAddress);
@@ -142,11 +142,11 @@ public class ConsumerNegotiationPipelineImpl extends AbstractNegotiationPipeline
         expectLatches.add(latch);
         stages.add(() ->
                 endpoint.registerHandler(REQUEST_PATH, event -> {
-                    var expanded = processJsonLd(event, createDspContext());
+                    var expanded = processJsonLd(event);
                     var negotiation = action.apply(expanded, consumerConnectorId);
                     endpoint.deregisterHandler(REQUEST_PATH);
                     latch.countDown();
-                    return serialize(processJsonLd(negotiation, createDspContext()));
+                    return serialize(processJsonLd(negotiation));
                 }));
         return this;
     }
@@ -177,7 +177,7 @@ public class ConsumerNegotiationPipelineImpl extends AbstractNegotiationPipeline
         expectLatches.add(latch);
         stages.add(() ->
                 endpoint.registerHandler(path, event -> {
-                    var expanded = processJsonLd(event, createDspContext());
+                    var expanded = processJsonLd(event);
                     action.accept(expanded);
                     endpoint.deregisterHandler(path);
                     latch.countDown();

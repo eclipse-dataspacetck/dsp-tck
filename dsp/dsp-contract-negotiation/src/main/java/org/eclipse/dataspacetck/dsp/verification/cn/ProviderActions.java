@@ -39,6 +39,9 @@ public class ProviderActions {
     private static final String NEGOTIATION_AGREEMENT_TEMPLATE = "%s/negotiations/%s/agreement";
     private static final String NEGOTIATION_FINALIZE_TEMPLATE = "%s/negotiations/%s/events";
 
+    private ProviderActions() {
+    }
+
     public static void postOffer(ContractNegotiation negotiation) {
         var contractOffer = createOffer(
                 negotiation.getId(),
@@ -62,7 +65,8 @@ public class ProviderActions {
                 randomUUID().toString(),
                 negotiation.getCounterPartyId(),
                 TCK_PARTICIPANT_ID,
-                negotiation.getDatasetId());
+                negotiation.getDatasetId(),
+                negotiation.getCallbackAddress());
 
         negotiation.transition(AGREED);
         try (var response = postJson(format(NEGOTIATION_AGREEMENT_TEMPLATE, negotiation.getCallbackAddress(), negotiation.getCorrelationId()), agreement)) {
@@ -97,8 +101,5 @@ public class ProviderActions {
         if (!response.isSuccessful()) {
             throw new AssertionError("Unexpected response code: " + response.code());
         }
-    }
-
-    private ProviderActions() {
     }
 }
