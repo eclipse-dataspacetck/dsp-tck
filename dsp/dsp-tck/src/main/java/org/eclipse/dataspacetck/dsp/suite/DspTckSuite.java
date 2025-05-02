@@ -37,7 +37,7 @@ import static org.eclipse.dataspacetck.core.system.ConsoleMonitor.DEBUG_PROPERTY
  * Launches the DSP TCK and runs the test suite.
  */
 public class DspTckSuite {
-    private static final String VERSION = "2024.1";
+    private static final String VERSION = "2025.1";
     private static final String CONFIG = "-config";
     private static final String DEFAULT_LAUNCHER = "org.eclipse.dataspacetck.dsp.system.DspSystemLauncher";
     private static final String TEST_PACKAGE = "org.eclipse.dataspacetck.dsp.verification";
