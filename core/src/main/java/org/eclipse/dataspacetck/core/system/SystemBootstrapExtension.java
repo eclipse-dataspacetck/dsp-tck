@@ -132,6 +132,7 @@ public class SystemBootstrapExtension implements BeforeAllCallback,
         if (executorService != null) {
             executorService.shutdown();
         }
+        started = false;
     }
 
     @Override
@@ -224,7 +225,7 @@ public class SystemBootstrapExtension implements BeforeAllCallback,
     }
 
     private static class DispatchingHandler implements HttpHandler {
-        private Queue<DefaultCallbackEndpoint> endpoints = new ConcurrentLinkedQueue<>();
+        private final Queue<DefaultCallbackEndpoint> endpoints = new ConcurrentLinkedQueue<>();
 
         void registerEndpoint(DefaultCallbackEndpoint endpoint) {
             endpoints.add(endpoint);
