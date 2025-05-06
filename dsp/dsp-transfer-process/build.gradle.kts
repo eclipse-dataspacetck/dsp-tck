@@ -1,0 +1,29 @@
+/*
+ *  Copyright (c) 2025 Metaform Systems, Inc.
+ *
+ *  This program and the accompanying materials are made available under the
+ *  terms of the Apache License, Version 2.0 which is available at
+ *  https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  SPDX-License-Identifier: Apache-2.0
+ *
+ *  Contributors:
+ *       Metaform Systems, Inc. - initial API and implementation
+ *
+ */
+
+plugins {
+    alias(libs.plugins.tck.generator)
+}
+
+dependencies {
+    implementation(libs.tck.common.api)
+    implementation(project(":core"))
+    implementation(project(":dsp:dsp-api"))
+    testImplementation(project(":dsp:dsp-system"))
+}
+
+tasks.test {
+    systemProperty("dataspacetck.launcher", "org.eclipse.dataspacetck.dsp.system.DspSystemLauncher")
+    systemProperty("dataspacetck.dsp.local.connector", "true")
+}

@@ -34,12 +34,12 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPAC
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_PROVIDER_PID_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.TCK_PARTICIPANT_ID;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createAcceptedEvent;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createContractRequest;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createCounterOffer;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createTermination;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createVerification;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.stringIdProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createAcceptedEvent;
+import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createContractRequest;
+import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createCounterOffer;
+import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createTermination;
+import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createVerification;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State.TERMINATED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

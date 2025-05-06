@@ -29,11 +29,11 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPAC
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_OFFER_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_PROVIDER_PID_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.ID;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.compactStringProperty;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createNegotiationResponse;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.mapProperty;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.stringIdProperty;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.stringProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.compactStringProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.mapProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createNegotiationResponse;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State.ACCEPTED;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State.AGREED;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State.FINALIZED;

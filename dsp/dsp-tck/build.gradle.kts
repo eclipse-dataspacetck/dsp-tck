@@ -33,9 +33,11 @@ dependencies {
     implementation(project(":dsp:dsp-api"))
     implementation(project(":dsp:dsp-system"))
     implementation(project(":dsp:dsp-contract-negotiation"))
+    implementation(project(":dsp:dsp-transfer-process"))
     implementation(project(":runtimes:tck-runtime"))
     implementation(libs.junit.platform.launcher)
     testImplementation(project(":dsp:dsp-contract-negotiation"))
+    testImplementation(project(":dsp:dsp-transfer-process"))
 }
 
 

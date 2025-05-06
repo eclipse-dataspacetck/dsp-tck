@@ -14,6 +14,9 @@
 
 package org.eclipse.dataspacetck.dsp.system.api.connector;
 
+import org.eclipse.dataspacetck.dsp.system.api.connector.tp.ConsumerTransferProcessManager;
+import org.eclipse.dataspacetck.dsp.system.api.connector.tp.ProviderTransferProcessManager;
+
 /**
  * The TCK Connector implementation.
  */
@@ -29,4 +32,13 @@ public interface Connector {
      */
     ConsumerNegotiationManager getConsumerNegotiationManager();
 
+    /**
+     * Returns the manager for provider-side transfer processes.
+     */
+    ProviderTransferProcessManager getProviderTransferProcessManager();
+
+    /**
+     * Returns the manager for consumer-side transfer processes.
+     */
+    ConsumerTransferProcessManager getConsumerTransferProcessManager();
 }

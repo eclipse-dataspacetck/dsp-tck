@@ -16,7 +16,6 @@ package org.eclipse.dataspacetck.dsp.system.client;
 
 import org.eclipse.dataspacetck.core.spi.boot.Monitor;
 import org.eclipse.dataspacetck.dsp.system.api.connector.Connector;
-import org.eclipse.dataspacetck.dsp.system.api.metadata.DspTestingWorkaround;
 
 import java.util.Map;
 
@@ -27,8 +26,8 @@ import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.postJso
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_PROVIDER_PID_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.TCK_PARTICIPANT_ID;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createNegotiationResponse;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.stringIdProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createNegotiationResponse;
 
 /**
  * Default implementation that supports dispatch to a local, in-memory test connector or a remote connector system via HTTP.
@@ -36,7 +35,6 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.s
 public class ConsumerNegotiationClientImpl implements ConsumerNegotiationClient {
     private static final String GET_PATH = "%s/negotiations/%s";
 
-    @DspTestingWorkaround("Should be %s/negotiations/%s/offers")
     private static final String OFFERS_PATH = "%s/negotiations/%s/offers";
     private static final String AGREEMENTS_PATH = "%s/negotiations/%s/agreement";
     private static final String FINALIZE_PATH = "%s/negotiations/%s/events";

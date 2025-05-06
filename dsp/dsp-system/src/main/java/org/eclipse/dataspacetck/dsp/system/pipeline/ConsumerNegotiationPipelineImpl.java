@@ -35,10 +35,10 @@ import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.serial
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_NAMESPACE;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.TCK_PARTICIPANT_ID;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createAgreement;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createFinalizedEvent;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.createOffer;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageFunctions.stringIdProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createAgreement;
+import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createFinalizedEvent;
+import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createOffer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**

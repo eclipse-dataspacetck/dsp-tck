@@ -26,19 +26,33 @@ import org.eclipse.dataspacetck.dsp.system.api.connector.Consumer;
 import org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions;
 import org.eclipse.dataspacetck.dsp.system.api.mock.ConsumerNegotiationMock;
 import org.eclipse.dataspacetck.dsp.system.api.mock.ProviderNegotiationMock;
+import org.eclipse.dataspacetck.dsp.system.api.mock.tp.ConsumerTransferProcessMock;
+import org.eclipse.dataspacetck.dsp.system.api.mock.tp.ProviderTransferProcessMock;
 import org.eclipse.dataspacetck.dsp.system.api.pipeline.ConsumerNegotiationPipeline;
 import org.eclipse.dataspacetck.dsp.system.api.pipeline.ProviderNegotiationPipeline;
+import org.eclipse.dataspacetck.dsp.system.api.pipeline.tp.ConsumerTransferProcessPipeline;
+import org.eclipse.dataspacetck.dsp.system.api.pipeline.tp.ProviderTransferProcessPipeline;
 import org.eclipse.dataspacetck.dsp.system.client.ConsumerNegotiationClient;
 import org.eclipse.dataspacetck.dsp.system.client.ConsumerNegotiationClientImpl;
 import org.eclipse.dataspacetck.dsp.system.client.ProviderNegotiationClient;
 import org.eclipse.dataspacetck.dsp.system.client.ProviderNegotiationClientImpl;
+import org.eclipse.dataspacetck.dsp.system.client.tp.ConsumerTransferProcessClient;
+import org.eclipse.dataspacetck.dsp.system.client.tp.ConsumerTransferProcessClientImpl;
+import org.eclipse.dataspacetck.dsp.system.client.tp.ProviderTransferProcessClient;
+import org.eclipse.dataspacetck.dsp.system.client.tp.ProviderTransferProcessClientImpl;
 import org.eclipse.dataspacetck.dsp.system.connector.TckConnector;
 import org.eclipse.dataspacetck.dsp.system.mock.ConsumerNegotiationMockImpl;
 import org.eclipse.dataspacetck.dsp.system.mock.NoOpConsumerNegotiationMock;
 import org.eclipse.dataspacetck.dsp.system.mock.NoOpProviderNegotiationMock;
 import org.eclipse.dataspacetck.dsp.system.mock.ProviderNegotiationMockImpl;
+import org.eclipse.dataspacetck.dsp.system.mock.tp.ConsumerTransferProcessMockImpl;
+import org.eclipse.dataspacetck.dsp.system.mock.tp.NoOpConsumerTransferProcessMock;
+import org.eclipse.dataspacetck.dsp.system.mock.tp.NoOpProviderTransferProcessMock;
+import org.eclipse.dataspacetck.dsp.system.mock.tp.ProviderTransferProcessMockImpl;
 import org.eclipse.dataspacetck.dsp.system.pipeline.ConsumerNegotiationPipelineImpl;
 import org.eclipse.dataspacetck.dsp.system.pipeline.ProviderNegotiationPipelineImpl;
+import org.eclipse.dataspacetck.dsp.system.pipeline.tp.ConsumerTransferProcessPipelineImpl;
+import org.eclipse.dataspacetck.dsp.system.pipeline.tp.ProviderTransferProcessPipelineImpl;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -58,6 +72,7 @@ public class DspSystemLauncher implements SystemLauncher {
     private static final String CONNECTOR_BASE_URL_CONFIG = TCK_PREFIX + ".dsp.connector.http.url";
     private static final String CONNECTOR_BASE_AUTHORIZATION_HEADER_CONFIG = TCK_PREFIX + ".dsp.connector.http.headers.authorization";
     private static final String CONNECTOR_INITIATE_URL_CONFIG = TCK_PREFIX + ".dsp.connector.negotiation.initiate.url";
+    private static final String CONNECTOR_TRANSFER_INITIATE_URL_CONFIG = TCK_PREFIX + ".dsp.connector.transfer.initiate.url";
     private static final String THREAD_POOL_CONFIG = TCK_PREFIX + ".dsp.thread.pool";
     private static final String DEFAULT_WAIT_CONFIG = TCK_PREFIX + ".dsp.default.wait";
     private static final int DEFAULT_WAIT_SECONDS = 15;
@@ -65,6 +80,10 @@ public class DspSystemLauncher implements SystemLauncher {
     private final Map<String, Connector> providerConnectors = new ConcurrentHashMap<>();
     private final Map<String, ProviderNegotiationMock> negotiationMocks = new ConcurrentHashMap<>();
     private final Map<String, ProviderNegotiationClient> negotiationClients = new ConcurrentHashMap<>();
+    private final Map<String, ProviderTransferProcessClient> providerTransferClients = new ConcurrentHashMap<>();
+    private final Map<String, ConsumerTransferProcessClient> consumerTransferClients = new ConcurrentHashMap<>();
+    private final Map<String, ConsumerTransferProcessMock> consumerTransferMocks = new ConcurrentHashMap<>();
+    private final Map<String, ProviderTransferProcessMock> providerTransferMocks = new ConcurrentHashMap<>();
     private final Map<String, ConsumerNegotiationMock> consumerNegotiationMocks = new ConcurrentHashMap<>();
     private final Map<String, ConsumerNegotiationClient> consumerNegotiationClients = new ConcurrentHashMap<>();
     private Monitor monitor;
@@ -73,6 +92,7 @@ public class DspSystemLauncher implements SystemLauncher {
     private String baseConnectorUrl;
     private String baseAuthorizationHeader;
     private String connectorInitiateUrl;
+    private String connectorTransferInitiateUrl;
     private boolean useLocalConnector;
     private long waitTime = DEFAULT_WAIT_SECONDS;
 
@@ -95,6 +115,10 @@ public class DspSystemLauncher implements SystemLauncher {
             if (connectorInitiateUrl == null) {
                 throw new RuntimeException("Required configuration not set: " + CONNECTOR_INITIATE_URL_CONFIG);
             }
+            connectorTransferInitiateUrl = configuration.getPropertyAsString(CONNECTOR_TRANSFER_INITIATE_URL_CONFIG, null);
+            if (connectorTransferInitiateUrl == null) {
+                throw new RuntimeException("Required configuration not set: " + CONNECTOR_TRANSFER_INITIATE_URL_CONFIG);
+            }
             connectorUnderTestId = configuration.getPropertyAsString(CONNECTOR_AGENT_ID_CONFIG, null);
             if (connectorUnderTestId == null) {
                 throw new RuntimeException("Required configuration not set: " + CONNECTOR_AGENT_ID_CONFIG);
@@ -112,11 +136,15 @@ public class DspSystemLauncher implements SystemLauncher {
     @Override
     public <T> boolean providesService(Class<T> type) {
         return type.equals(ProviderNegotiationClient.class) ||
-               type.equals(Connector.class) ||
-               type.equals(ProviderNegotiationMock.class) ||
-               type.equals(ConsumerNegotiationMock.class) ||
-               type.equals(ConsumerNegotiationPipeline.class) ||
-               type.equals(ProviderNegotiationPipeline.class);
+                type.equals(Connector.class) ||
+                type.equals(ProviderNegotiationMock.class) ||
+                type.equals(ConsumerNegotiationMock.class) ||
+                type.equals(ConsumerNegotiationPipeline.class) ||
+                type.equals(ProviderNegotiationPipeline.class) ||
+                type.equals(ConsumerTransferProcessPipeline.class) ||
+                type.equals(ProviderTransferProcessPipeline.class) ||
+                type.equals(ConsumerTransferProcessMock.class) ||
+                type.equals(ProviderTransferProcessMock.class);
     }
 
     @Nullable
@@ -136,6 +164,14 @@ public class DspSystemLauncher implements SystemLauncher {
             return type.cast(createNegotiationClient(configuration.getScopeId()));
         } else if (ConsumerNegotiationClient.class.equals(type)) {
             return type.cast(createConsumerNegotiationClient(configuration.getScopeId(), configuration, resolver));
+        } else if (ProviderTransferProcessPipeline.class.equals(type)) {
+            return type.cast(createProviderTransferProcessPipeline(configuration, resolver));
+        } else if (ConsumerTransferProcessPipeline.class.equals(type)) {
+            return type.cast(createConsumerTransferProcessPipeline(configuration, resolver));
+        } else if (ConsumerTransferProcessMock.class.equals(type)) {
+            return type.cast(createConsumerTransferProcessMock(type, configuration.getScopeId(), configuration, resolver));
+        } else if (ProviderTransferProcessMock.class.equals(type)) {
+            return type.cast(createProviderTransferProcessMock(type, configuration.getScopeId(), configuration, resolver));
         }
         return null;
     }
@@ -230,4 +266,86 @@ public class DspSystemLauncher implements SystemLauncher {
         });
     }
 
+    private ConsumerTransferProcessPipeline createConsumerTransferProcessPipeline(ServiceConfiguration configuration, ServiceResolver resolver) {
+        var scopeId = configuration.getScopeId();
+        var transferClient = createConsumerTransferProcessClientClient(scopeId, configuration, resolver);
+        var callbackEndpoint = (CallbackEndpoint) resolver.resolve(CallbackEndpoint.class, configuration);
+        var providerConnector = providerConnectors.computeIfAbsent(scopeId, k -> new TckConnector(monitor));
+        return new ConsumerTransferProcessPipelineImpl(transferClient,
+                callbackEndpoint,
+                providerConnector,
+                connectorUnderTestId,
+                monitor,
+                waitTime);
+    }
+
+    private ProviderTransferProcessPipeline createProviderTransferProcessPipeline(ServiceConfiguration configuration, ServiceResolver resolver) {
+        var scopeId = configuration.getScopeId();
+        var negotiationClient = createProviderTransferProcessClientClient(scopeId, configuration, resolver);
+        var callbackEndpoint = (CallbackEndpoint) resolver.resolve(CallbackEndpoint.class, configuration);
+        var consumerConnector = consumerConnectors.computeIfAbsent(scopeId, k -> new TckConnector(monitor));
+        return new ProviderTransferProcessPipelineImpl(negotiationClient,
+                callbackEndpoint,
+                consumerConnector,
+                connectorUnderTestId,
+                monitor,
+                waitTime);
+    }
+    
+    private ConsumerTransferProcessClient createConsumerTransferProcessClientClient(String scopeId,
+                                                                                    ServiceConfiguration configuration,
+                                                                                    ServiceResolver resolver) {
+        var providerConnector = providerConnectors.computeIfAbsent(scopeId, k -> new TckConnector(monitor));
+        return consumerTransferClients.computeIfAbsent(scopeId, k -> {
+            if (useLocalConnector) {
+                var consumerConnector = consumerConnectors.computeIfAbsent(scopeId, k2 -> new TckConnector(monitor));
+                var callbackEndpoint = (CallbackEndpoint) resolver.resolve(CallbackEndpoint.class, configuration);
+                return new ConsumerTransferProcessClientImpl(consumerConnector, monitor);
+            }
+            var callbackEndpoint = (CallbackEndpoint) resolver.resolve(CallbackEndpoint.class, configuration);
+            assert callbackEndpoint != null;
+            return new ConsumerTransferProcessClientImpl(
+                    connectorTransferInitiateUrl,
+                    callbackEndpoint.getAddress(),
+                    monitor);
+        });
+    }
+
+    private ProviderTransferProcessClient createProviderTransferProcessClientClient(String scopeId,
+                                                                                    ServiceConfiguration configuration, ServiceResolver resolver) {
+        return providerTransferClients.computeIfAbsent(scopeId, k -> {
+            if (useLocalConnector) {
+                return new ProviderTransferProcessClientImpl(providerConnectors.computeIfAbsent(scopeId, k2 -> new TckConnector(monitor)), monitor);
+            }
+            return new ProviderTransferProcessClientImpl(baseConnectorUrl, monitor);
+        });
+    }
+
+    private <T> T createConsumerTransferProcessMock(Class<T> type, String scopeId, ServiceConfiguration configuration, ServiceResolver resolver) {
+        return type.cast(consumerTransferMocks.computeIfAbsent(scopeId, k -> {
+            if (useLocalConnector) {
+                var connector = consumerConnectors.computeIfAbsent(scopeId, k2 -> new TckConnector(monitor));
+                var manager = connector.getConsumerTransferProcessManager();
+                var callbackEndpoint = (CallbackEndpoint) resolver.resolve(CallbackEndpoint.class, configuration);
+                @SuppressWarnings("DataFlowIssue") var address = callbackEndpoint.getAddress();
+                return new ConsumerTransferProcessMockImpl(manager, executor, address);
+            } else {
+                return new NoOpConsumerTransferProcessMock();
+            }
+        }));
+    }
+
+    private <T> T createProviderTransferProcessMock(Class<T> type, String scopeId, ServiceConfiguration configuration, ServiceResolver resolver) {
+        return type.cast(providerTransferMocks.computeIfAbsent(scopeId, k -> {
+            if (useLocalConnector) {
+                var connector = providerConnectors.computeIfAbsent(scopeId, k2 -> new TckConnector(monitor));
+                var manager = connector.getProviderTransferProcessManager();
+                var callbackEndpoint = (CallbackEndpoint) resolver.resolve(CallbackEndpoint.class, configuration);
+                @SuppressWarnings("DataFlowIssue") var address = callbackEndpoint.getAddress();
+                return new ProviderTransferProcessMockImpl(manager, executor, address);
+            } else {
+                return new NoOpProviderTransferProcessMock();
+            }
+        }));
+    }
 }

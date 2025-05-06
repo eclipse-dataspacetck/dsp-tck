@@ -25,13 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static java.util.Collections.emptyList;
-import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.CONTEXT;
-import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_CONTEXT;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_AGREEMENT;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_CALLBACK_ADDRESS;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_CODE;
@@ -44,7 +41,7 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPAC
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_TIMESTAMP;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.ID;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.TYPE;
-import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.VALUE;
+import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.createDspContext;
 import static org.eclipse.dataspacetck.dsp.system.api.message.OdrlConstants.ODRL_AGREEMENT_TYPE;
 import static org.eclipse.dataspacetck.dsp.system.api.message.OdrlConstants.ODRL_OFFER_TYPE;
 import static org.eclipse.dataspacetck.dsp.system.api.message.OdrlConstants.ODRL_PROPERTY_ACTION;
@@ -58,11 +55,10 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.OdrlConstants.ODRL
 /**
  * Utility methods for creating DSP messages.
  */
-public class MessageFunctions {
-    private static final Map<String, String> IDENTITY_TYPE = Map.of("@type", "@id");
+public class NegotiationFunctions {
 
 
-    private MessageFunctions() {
+    private NegotiationFunctions() {
     }
 
     public static Map<String, Object> createTermination(String providerId, String consumerId, String code, String... reasons) {
@@ -222,68 +218,6 @@ public class MessageFunctions {
         return message;
     }
 
-    public static Map<String, Object> mapProperty(String key, Map<String, Object> map) {
-        var untypedValue = requireNonNull(map.get(key), "No value for: " + key);
-        //noinspection rawtypes
-        if (untypedValue instanceof List valueList) {
-            if (valueList.isEmpty()) {
-                throw new AssertionError(format("Property '%s' was empty", key));
-            }
-            @SuppressWarnings("SequencedCollectionMethodCanBeUsed")
-            var valueContainer = valueList.get(0);
-            //noinspection rawtypes
-            if (valueContainer instanceof Map propertyMap) {
-                //noinspection unchecked
-                return propertyMap;
-            }
-        }
-        throw new AssertionError(format("Property '%s' is not a Map", key));
-    }
-
-    public static String compactStringProperty(String key, Map<String, Object> map) {
-        var value = requireNonNull(map.get(key), "No value for: " + key);
-        return (String) value;
-    }
-
-    public static String stringProperty(String key, Map<String, Object> map) {
-        return stringProperty(key, VALUE, map);
-    }
-
-    public static String stringIdProperty(String key, Map<String, Object> map) {
-        return stringProperty(key, ID, map);
-    }
-
-    public static String stringProperty(String key, String valKey, Map<String, Object> map) {
-        var untypedValue = requireNonNull(map.get(key), "No value for: " + key);
-        //noinspection rawtypes
-        if (untypedValue instanceof List valueList) {
-            if (valueList.isEmpty()) {
-                throw new AssertionError(format("Property '%s' was empty", key));
-            }
-            @SuppressWarnings("SequencedCollectionMethodCanBeUsed")
-            var valueContainer = valueList.get(0);
-            if (valueContainer instanceof Map) {
-                @SuppressWarnings("rawtypes")
-                var value = requireNonNull(((Map) valueContainer).get(valKey), format("No %s attribute for property: %s", valKey, key));
-                return value.toString();
-            }
-        }
-        throw new AssertionError(format("Property '%s' was not in expanded @value form", key));
-    }
-
-    public static String identityProperty(String key, Map<String, Object> map) {
-        var value = requireNonNull(map.get(key), "No value for: " + key);
-        if (value instanceof Map) {
-            @SuppressWarnings("rawtypes")
-            var idValue = requireNonNull(((Map) value).get(ID), "No @id value for property: " + key);
-            return idValue.toString();
-        }
-        throw new AssertionError(format("Property '%s' was not in expanded @id form", key));
-    }
-
-    public static List<String> createDspContext() {
-        return List.of(DSPACE_CONTEXT);
-    }
 
     @NotNull
     private static Map<String, Object> createBaseMessage(String type) {
