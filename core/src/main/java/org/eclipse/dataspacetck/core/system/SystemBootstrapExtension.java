@@ -241,11 +241,13 @@ public class SystemBootstrapExtension implements BeforeAllCallback,
             for (var endpoint : endpoints) {
                 if (endpoint.handlesPath(path)) {
                     var response = endpoint.apply(path, exchange.getRequestHeaders(), exchange.getRequestBody());
+                    response.headers().forEach(exchange.getResponseHeaders()::add);
                     if (response.result() == null) {
                         exchange.sendResponseHeaders(response.code(), 0);
                         exchange.close();
                     } else {
                         var bytes = response.result().getBytes();
+                        response.headers().forEach(exchange.getResponseHeaders()::add);
                         exchange.sendResponseHeaders(response.code(), bytes.length);
                         var responseBody = exchange.getResponseBody();
                         responseBody.write(bytes);

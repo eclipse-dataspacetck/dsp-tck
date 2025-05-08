@@ -25,4 +25,8 @@ public interface ProtocolHandler {
 
     HandlerResponse apply(Map<String, List<String>> headers, InputStream body);
 
+    default HandlerResponse apply(String path, Map<String, List<String>> headers, InputStream body) {
+        return apply(headers, body);
+    }
+
 }

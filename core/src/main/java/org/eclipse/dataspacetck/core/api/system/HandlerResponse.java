@@ -14,8 +14,13 @@
 
 package org.eclipse.dataspacetck.core.api.system;
 
+import java.util.Map;
+
 /**
  * A handler response.
  */
-public record HandlerResponse(int code, String result) {
+public record HandlerResponse(int code, String result, Map<String, String> headers) {
+    public HandlerResponse(int code, String result) {
+        this(code, result, Map.of());
+    }
 }
