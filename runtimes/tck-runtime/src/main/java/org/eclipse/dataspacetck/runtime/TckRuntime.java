@@ -33,11 +33,12 @@ import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNa
  */
 public class TckRuntime {
     private static final String TEST_POSTFIX = ".*Test";
-
+    private final List<String> packages = new ArrayList<>();
+    private final Map<String, String> properties = new HashMap<>();
     private Monitor monitor;
 
-    private List<String> packages = new ArrayList<>();
-    private Map<String, String> properties = new HashMap<>();
+    private TckRuntime() {
+    }
 
     public TestExecutionSummary execute() {
         properties.forEach(System::setProperty);
@@ -54,15 +55,16 @@ public class TckRuntime {
         launcher.registerTestExecutionListeners(summaryListener);
         launcher.discover(request);
         launcher.execute(request);
-
+        properties.forEach((k, v) -> System.clearProperty(k));
         return summaryListener.getSummary();
     }
 
-    private TckRuntime() {
-    }
-
     public static class Builder {
-        private TckRuntime launcher;
+        private final TckRuntime launcher;
+
+        private Builder() {
+            launcher = new TckRuntime();
+        }
 
         public static Builder newInstance() {
             return new Builder();
@@ -85,10 +87,6 @@ public class TckRuntime {
 
         public TckRuntime build() {
             return launcher;
-        }
-
-        private Builder() {
-            launcher = new TckRuntime();
         }
 
         public Builder monitor(Monitor monitor) {
