@@ -38,36 +38,7 @@ public interface ConsumerTransferProcessPipeline extends TransferProcessPipeline
      * Expects a transfer request and executes the given action.
      */
     ConsumerTransferProcessPipeline expectTransferRequest(BiFunction<Map<String, Object>, String, Map<String, Object>> action);
-
-    /**
-     * Sends a transfer request to the consumer connector being verified.
-     *
-     * @return this pipeline instance
-     */
-    default ConsumerTransferProcessPipeline sendStarted() {
-        return sendStarted(null);
-    }
-
-    /**
-     * Sends a started event to the consumer connector being verified.
-     *
-     * @param dataAddress the data address to send
-     * @return this pipeline instance
-     */
-    ConsumerTransferProcessPipeline sendStarted(Map<String, Object> dataAddress);
-
-    default ConsumerTransferProcessPipeline sendTermination() {
-        return sendTermination(false);
-    }
-
-    /**
-     * Sends a termination event to the consumer connector being verified.
-     *
-     * @param expectError whether to expect an error
-     * @return this pipeline instance
-     */
-    ConsumerTransferProcessPipeline sendTermination(boolean expectError);
-
+    
     /**
      * Verifies the active consumer transfer process is in the given state.
      */

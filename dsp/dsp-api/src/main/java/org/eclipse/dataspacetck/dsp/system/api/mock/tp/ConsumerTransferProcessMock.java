@@ -30,4 +30,10 @@ public interface ConsumerTransferProcessMock extends TransferProcessMock {
      */
     void recordInitializedAction(BiConsumer<String, TransferProcess> action);
 
+    /**
+     * Records an action to be executed when a transfer process is started.
+     *
+     * @param action the action to record
+     */
+    void recordStartedAction(BiConsumer<String, TransferProcess> action);
 }

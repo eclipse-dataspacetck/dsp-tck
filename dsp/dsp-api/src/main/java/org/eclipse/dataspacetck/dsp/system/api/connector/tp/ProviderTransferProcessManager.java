@@ -27,14 +27,5 @@ public interface ProviderTransferProcessManager extends TransferProcessManager {
      * Handles a transfer request received from the consumer.
      */
     Map<String, Object> handleTransferRequest(Map<String, Object> transferRequest, String counterPartyId);
-
-    /**
-     * Transition to the "started" state.
-     */
-    void started(String providerId);
-
-    /**
-     * Transition to the "terminated" state.
-     */
-    void terminated(String providerId);
+    
 }

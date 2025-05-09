@@ -19,17 +19,11 @@ import java.util.Map;
 /**
  * Proxy to the provider connector being verified for transfer process.
  */
-public interface ProviderTransferProcessClient {
-    
+public interface ProviderTransferProcessClient extends TransferProcessClient {
+
     /**
      * Sends a transfer request to the provider connector.
      */
     Map<String, Object> transferRequest(Map<String, Object> message, String counterPartyId, boolean expectError);
-
-
-    /**
-     * Retrieves the transfer process from the consumer connector.
-     */
-    Map<String, Object> getTransferProcess(String providerId);
 
 }

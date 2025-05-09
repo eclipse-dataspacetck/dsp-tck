@@ -87,8 +87,22 @@ public class TransferFunctions {
         return message;
     }
 
-    public static Map<String, Object> createTermination(String providerId, String consumerId, String code, String... reasons) {
+    public static Map<String, Object> createTermination(String providerPid, String consumerPid, String code, String... reasons) {
         var message = createBaseMessage("TransferTerminationMessage");
+        message.put(CONTEXT, createDspContext());
+
+        message.put(DSPACE_PROPERTY_PROVIDER_PID, providerPid);
+        message.put(DSPACE_PROPERTY_CONSUMER_PID, consumerPid);
+        message.put(DSPACE_PROPERTY_CODE, code);
+
+        if (reasons != null && reasons.length > 0) {
+            message.put(DSPACE_PROPERTY_REASON, Arrays.stream(reasons).map(reason -> Map.of("message", reason)).collect(toList()));
+        }
+        return message;
+    }
+
+    public static Map<String, Object> createSuspension(String providerId, String consumerId, String code, String... reasons) {
+        var message = createBaseMessage("TransferSuspensionMessage");
         message.put(CONTEXT, createDspContext());
 
         message.put(DSPACE_PROPERTY_PROVIDER_PID, providerId);
@@ -98,6 +112,15 @@ public class TransferFunctions {
         if (reasons != null && reasons.length > 0) {
             message.put(DSPACE_PROPERTY_REASON, Arrays.stream(reasons).map(reason -> Map.of("message", reason)).collect(toList()));
         }
+        return message;
+    }
+
+    public static Map<String, Object> createCompletion(String providerId, String consumerId) {
+        var message = createBaseMessage("TransferCompletionMessage");
+        message.put(CONTEXT, createDspContext());
+
+        message.put(DSPACE_PROPERTY_PROVIDER_PID, providerId);
+        message.put(DSPACE_PROPERTY_CONSUMER_PID, consumerId);
         return message;
     }
 

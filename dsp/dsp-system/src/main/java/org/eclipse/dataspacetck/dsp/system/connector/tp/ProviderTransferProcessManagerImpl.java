@@ -22,22 +22,25 @@ import java.util.Map;
 
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_CALLBACK_ADDRESS_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_CONSUMER_PID_EXPANDED;
+import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_PROVIDER_PID_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringProperty;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createTransferResponse;
-import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.STARTED;
-import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.TERMINATED;
+import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.TransferKind.Provider;
 
 public class ProviderTransferProcessManagerImpl extends AbstractTransferProcessManager implements ProviderTransferProcessManager {
     private final Monitor monitor;
 
     public ProviderTransferProcessManagerImpl(Monitor monitor) {
+        super(monitor);
         this.monitor = monitor;
     }
 
     @Override
     public Map<String, Object> handleTransferRequest(Map<String, Object> transferRequest, String counterPartyId) {
         var consumerPid = stringIdProperty(DSPACE_PROPERTY_CONSUMER_PID_EXPANDED, transferRequest);
+        monitor.debug("Received transfer request message with consumer pid: " + consumerPid);
+
         var prevTransfer = findByCorrelationId(consumerPid);
         if (prevTransfer != null) {
             return createTransferResponse(prevTransfer.getId(), prevTransfer.getCorrelationId(), prevTransfer.getState().toString());
@@ -47,6 +50,7 @@ public class ProviderTransferProcessManagerImpl extends AbstractTransferProcessM
                 .correlationId(consumerPid)
                 .state(TransferProcess.State.REQUESTED)
                 .callbackAddress(callbackAddress)
+                .transferKind(Provider)
                 .build();
 
         transferProcesses.put(transfer.getId(), transfer);
@@ -57,14 +61,9 @@ public class ProviderTransferProcessManagerImpl extends AbstractTransferProcessM
     }
 
     @Override
-    public void started(String providerId) {
-        var transfer = findById(providerId);
-        transfer.transition(STARTED);
-    }
-
-    @Override
-    public void terminated(String providerId) {
-        var transfer = findById(providerId);
-        transfer.transition(TERMINATED);
+    protected TransferId parseId(Map<String, Object> message) {
+        var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, message);
+        var consumerId = stringIdProperty(DSPACE_PROPERTY_CONSUMER_PID_EXPANDED, message);
+        return new TransferId(providerId, consumerId);
     }
 }

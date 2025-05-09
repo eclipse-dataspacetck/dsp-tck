@@ -19,6 +19,7 @@ import org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess;
 
 import static java.lang.String.format;
 import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.postJson;
+import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createCompletion;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createStartRequest;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createTermination;
 
@@ -28,12 +29,12 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctio
 public class ProviderActions {
     private static final String TRANSFER_START_PATH = "%s/transfers/%s/start";
     private static final String TRANSFER_TERMINATION_PATH = "%s/transfers/%s/termination";
+    private static final String TRANSFER_COMPLETION_PATH = "%s/transfers/%s/completion";
+    private static final String TRANSFER_SUSPENSION_PATH = "%s/transfers/%s/suspension";
 
 
     public static void postStartTransfer(TransferProcess transferProcess) {
-
-        var message = createStartRequest(transferProcess.getId(), transferProcess.getCorrelationId(), null);
-
+        var message = createStartRequest(transferProcess.providerPid(), transferProcess.consumerPid(), null);
         transferProcess.transition(TransferProcess.State.STARTED);
         var url = format(TRANSFER_START_PATH, transferProcess.getCallbackAddress(), transferProcess.getCorrelationId());
         try (var response = postJson(url, message)) {
@@ -42,9 +43,25 @@ public class ProviderActions {
     }
 
     public static void postTerminate(TransferProcess transferProcess) {
-        var termination = createTermination(transferProcess.getId(), transferProcess.getCorrelationId(), "1");
+        var termination = createTermination(transferProcess.providerPid(), transferProcess.consumerPid(), "1");
         transferProcess.transition(TransferProcess.State.TERMINATED);
         try (var response = postJson(format(TRANSFER_TERMINATION_PATH, transferProcess.getCallbackAddress(), transferProcess.getCorrelationId()), termination)) {
+            checkResponse(response);
+        }
+    }
+
+    public static void postComplete(TransferProcess transferProcess) {
+        var completion = createCompletion(transferProcess.providerPid(), transferProcess.consumerPid());
+        transferProcess.transition(TransferProcess.State.COMPLETED);
+        try (var response = postJson(format(TRANSFER_COMPLETION_PATH, transferProcess.getCallbackAddress(), transferProcess.getCorrelationId()), completion)) {
+            checkResponse(response);
+        }
+    }
+
+    public static void postSuspend(TransferProcess transferProcess) {
+        var suspension = createTermination(transferProcess.providerPid(), transferProcess.consumerPid(), "1");
+        transferProcess.transition(TransferProcess.State.SUSPENDED);
+        try (var response = postJson(format(TRANSFER_SUSPENSION_PATH, transferProcess.getCallbackAddress(), transferProcess.getCorrelationId()), suspension)) {
             checkResponse(response);
         }
     }

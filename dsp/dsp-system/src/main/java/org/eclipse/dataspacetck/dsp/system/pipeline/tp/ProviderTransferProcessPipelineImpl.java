@@ -21,45 +21,37 @@ import org.eclipse.dataspacetck.dsp.system.api.pipeline.tp.ProviderTransferProce
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess;
 import org.eclipse.dataspacetck.dsp.system.client.tp.ProviderTransferProcessClient;
 
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.function.Function;
-
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.processJsonLd;
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.serialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_NAMESPACE;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_PROVIDER_PID_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createTransferRequest;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ProviderTransferProcessPipelineImpl extends AbstractTransferProcessPipeline<ProviderTransferProcessPipeline> implements ProviderTransferProcessPipeline {
 
-    private static final String TRANSFER_START_PATH = "/transfers/[^/]+/start";
-    private static final String TRANSFER_TERMINATION_PATH = "/transfers/[^/]+/termination";
-
-
     private final ProviderTransferProcessClient transferProcessClient;
     private final Connector consumerConnector;
+    private final String providerBaseUrl;
     private final String providerConnectorId;
 
     public ProviderTransferProcessPipelineImpl(ProviderTransferProcessClient transferProcessClient,
                                                CallbackEndpoint endpoint,
                                                Connector consumerConnector,
+                                               String providerBaseUrl,
                                                String providerConnectorId,
                                                Monitor monitor,
                                                long waitTime) {
-        super(endpoint, monitor, waitTime);
+        super(transferProcessClient, endpoint, monitor, waitTime);
         this.transferProcessClient = transferProcessClient;
         this.consumerConnector = consumerConnector;
+        this.providerBaseUrl = providerBaseUrl;
         this.providerConnectorId = providerConnectorId;
     }
 
     @Override
     public ProviderTransferProcessPipeline sendTransferRequest(String agreementId, String format, TransferProcess.DataAddress dataAddress) {
         stages.add(() -> {
-            transferProcess = consumerConnector.getConsumerTransferProcessManager().createTransferProcess(agreementId, format, dataAddress);
+            transferProcess = consumerConnector.getConsumerTransferProcessManager().createTransferProcess(agreementId, format, providerBaseUrl, dataAddress);
             var contractRequest = createTransferRequest(transferProcess.getId(), transferProcess.getAgreementId(), transferProcess.getFormat(), transferProcess.getDataAddress(), endpoint.getAddress());
 
             monitor.debug("Sending transfer request");
@@ -71,42 +63,37 @@ public class ProviderTransferProcessPipelineImpl extends AbstractTransferProcess
     }
 
     @Override
-    public ProviderTransferProcessPipeline expectStartMessage(Function<Map<String, Object>, Map<String, Object>> action) {
-        var latch = new CountDownLatch(1);
-        expectLatches.add(latch);
-        stages.add(() ->
-                endpoint.registerHandler(TRANSFER_START_PATH, offer -> {
-                    var transfer = action.apply((processJsonLd(offer)));
-                    endpoint.deregisterHandler(TRANSFER_START_PATH);
-                    latch.countDown();
-                    return serialize(transfer);
-                }));
-        return this;
-    }
-
-    @Override
-    public ProviderTransferProcessPipeline expectTerminationMessage(Function<Map<String, Object>, Map<String, Object>> action) {
-        var latch = new CountDownLatch(1);
-        expectLatches.add(latch);
-        stages.add(() ->
-                endpoint.registerHandler(TRANSFER_TERMINATION_PATH, offer -> {
-                    var transfer = action.apply((processJsonLd(offer)));
-                    endpoint.deregisterHandler(TRANSFER_TERMINATION_PATH);
-                    latch.countDown();
-                    return serialize(transfer);
-                }));
-
+    protected ProviderTransferProcessPipeline self() {
         return this;
     }
 
     @Override
     public ProviderTransferProcessPipeline thenVerifyProviderState(TransferProcess.State state) {
-        stages.add(() -> {
-            pause();
-            var providerTransferProcess = transferProcessClient.getTransferProcess(transferProcess.getCorrelationId());
+        thenWait("for provider transfer process state to be " + state, () -> {
+            var providerTransferProcess = transferProcessClient.getTransferProcess(transferProcess.getCorrelationId(), transferProcess.getCallbackAddress());
             var actual = stringIdProperty(DSPACE_PROPERTY_STATE_EXPANDED, providerTransferProcess);
-            assertEquals(DSPACE_NAMESPACE + state.toString(), actual);
+            return (DSPACE_NAMESPACE + state.toString()).equals(actual);
         });
         return this;
+    }
+
+    @Override
+    protected void suspended(String id) {
+        consumerConnector.getConsumerTransferProcessManager().suspended(id);
+    }
+
+    @Override
+    protected void completed(String id) {
+        consumerConnector.getConsumerTransferProcessManager().completed(id);
+    }
+
+    @Override
+    protected void terminated(String id) {
+        consumerConnector.getConsumerTransferProcessManager().terminated(id);
+    }
+
+    @Override
+    protected void started(String id) {
+        consumerConnector.getConsumerTransferProcessManager().started(id);
     }
 }

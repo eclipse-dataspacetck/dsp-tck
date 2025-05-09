@@ -18,6 +18,9 @@ import org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+import java.util.function.Predicate;
+
 /**
  * Manages transfer processes. Subclasses implement specific behavior for consumer and provider state transitions.
  */
@@ -34,7 +37,7 @@ public interface TransferProcessManager {
      */
     @Nullable
     TransferProcess findByCorrelationId(String id);
-    
+
     /**
      * Registers a listener.
      */
@@ -44,4 +47,51 @@ public interface TransferProcessManager {
      * Removes a listener.
      */
     void deregisterListener(TransferProcessListener listener);
+
+    /**
+     * Transition to the "terminated" state.
+     */
+    void terminated(String providerId);
+
+    /**
+     * Transition to the "completed" state.
+     */
+    void completed(String providerId);
+
+    /**
+     * Transition to the "suspended" state.
+     */
+    void suspended(String providerId);
+
+    /**
+     * Transition to the "started" state.
+     */
+    void started(String providerId);
+    
+    /**
+     * Processes a transfer completion message received from the counter-party.
+     */
+    Map<String, Object> handleCompletion(Map<String, Object> completionMessage);
+
+    /**
+     * Processes a transfer termination message received from the counter-party.
+     */
+    Map<String, Object> handleTermination(Map<String, Object> terminatedMessage);
+
+    /**
+     * Processes a transfer suspension message received from the counter-party.
+     */
+    Map<String, Object> handleSuspension(Map<String, Object> suspensionMessage);
+
+    /**
+     * Processes a transfer request received from the counter-party.
+     */
+    Map<String, Object> handleStart(Map<String, Object> startMessage, Predicate<TransferProcess.DataAddress> dataAddressPredicate);
+
+    /**
+     * Processes a transfer request received from the counter-party.
+     */
+    default Map<String, Object> handleStart(Map<String, Object> start) {
+        return handleStart(start, dataAddress -> true);
+    }
 }

@@ -41,4 +41,9 @@ public class NoOpConsumerTransferProcessMock implements ConsumerTransferProcessM
     public void recordInitializedAction(BiConsumer<String, TransferProcess> action) {
 
     }
+
+    @Override
+    public void recordStartedAction(BiConsumer<String, TransferProcess> action) {
+
+    }
 }

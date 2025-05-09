@@ -31,9 +31,6 @@ import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.serial
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_NAMESPACE;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
-import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createStartRequest;
-import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createTermination;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ConsumerTransferProcessPipelineImpl extends AbstractTransferProcessPipeline<ConsumerTransferProcessPipeline> implements ConsumerTransferProcessPipeline {
 
@@ -49,7 +46,7 @@ public class ConsumerTransferProcessPipelineImpl extends AbstractTransferProcess
                                                String consumerConnectorId,
                                                Monitor monitor,
                                                long waitTime) {
-        super(endpoint, monitor, waitTime);
+        super(transferProcessClient, endpoint, monitor, waitTime);
         this.transferProcessClient = transferProcessClient;
         this.providerConnector = providerConnector;
         this.consumerConnectorId = consumerConnectorId;
@@ -90,43 +87,40 @@ public class ConsumerTransferProcessPipelineImpl extends AbstractTransferProcess
     }
 
     @Override
-    public ConsumerTransferProcessPipeline sendStarted(Map<String, Object> dataAddress) {
-        stages.add(() -> {
-            var providerId = transferProcess.getId();
-            var consumerId = transferProcess.getCorrelationId();
-            var startMessage = createStartRequest(providerId, consumerId, dataAddress);
-            monitor.debug("Sending transfer start");
-            var consumerAddress = transferProcess.getCallbackAddress();
-            transferProcessClient.startTransfer(consumerId, startMessage, consumerAddress, false);
-            providerConnector.getProviderTransferProcessManager().started(providerId);
-        });
+    protected ConsumerTransferProcessPipeline self() {
         return this;
     }
 
     @Override
-    public ConsumerTransferProcessPipeline sendTermination(boolean expectError) {
-        stages.add(() -> {
-            var providerId = transferProcess.getId();
-            var consumerId = transferProcess.getCorrelationId();
-            var terminationMessage = createTermination(providerId, consumerId, "1");
-            monitor.debug("Sending transfer termination");
-            var consumerAddress = transferProcess.getCallbackAddress();
-            transferProcessClient.terminateTransfer(consumerId, terminationMessage, consumerAddress, expectError);
-            providerConnector.getProviderTransferProcessManager().terminated(providerId);
-        });
-        return this;
+    protected void suspended(String id) {
+        providerConnector.getProviderTransferProcessManager().suspended(id);
+    }
+
+    @Override
+    protected void completed(String id) {
+        providerConnector.getProviderTransferProcessManager().completed(id);
+    }
+
+    @Override
+    protected void terminated(String id) {
+        providerConnector.getProviderTransferProcessManager().terminated(id);
+    }
+
+    @Override
+    protected void started(String id) {
+        providerConnector.getProviderTransferProcessManager().started(id);
     }
 
     @Override
     public ConsumerTransferProcessPipeline thenVerifyConsumerState(TransferProcess.State state) {
-        stages.add(() -> {
-            pause();
+        thenWait("for consumer transfer process state to be " + state, () -> {
             var callbackAddress = transferProcess.getCallbackAddress();
             var processId = this.transferProcess.getCorrelationId();
-            var negotiation = transferProcessClient.getTransferProcess(processId, callbackAddress);
-            var actual = stringIdProperty(DSPACE_PROPERTY_STATE_EXPANDED, negotiation);
-            assertEquals(DSPACE_NAMESPACE + state.toString(), actual);
+            var tp = transferProcessClient.getTransferProcess(processId, callbackAddress);
+            var actual = stringIdProperty(DSPACE_PROPERTY_STATE_EXPANDED, tp);
+            return (DSPACE_NAMESPACE + state.toString()).equals(actual);
         });
         return this;
     }
+
 }

@@ -14,9 +14,6 @@
 
 package org.eclipse.dataspacetck.dsp.system.api.pipeline.tp;
 
-import java.util.Map;
-import java.util.function.Function;
-
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.DataAddress;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State;
 
@@ -48,24 +45,9 @@ public interface ProviderTransferProcessPipeline extends TransferProcessPipeline
     ProviderTransferProcessPipeline sendTransferRequest(String agreementId, String format, DataAddress dataAddress);
 
     /**
-     * Expects a transfer start message and executes the given action.
-     *
-     * @param action the action to execute
-     * @return this pipeline instance
-     */
-    ProviderTransferProcessPipeline expectStartMessage(Function<Map<String, Object>, Map<String, Object>> action);
-
-    /**
-     * Expects a transfer termination message and executes the given action.
-     *
-     * @param action the action to execute
-     * @return this pipeline instance
-     */
-    ProviderTransferProcessPipeline expectTerminationMessage(Function<Map<String, Object>, Map<String, Object>> action);
-
-    /**
      * Verifies the active provider transfer process is in the given state.
      */
     ProviderTransferProcessPipeline thenVerifyProviderState(State state);
+
 
 }

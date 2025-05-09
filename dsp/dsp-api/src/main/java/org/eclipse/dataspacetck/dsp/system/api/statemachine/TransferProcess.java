@@ -16,6 +16,7 @@ package org.eclipse.dataspacetck.dsp.system.api.statemachine;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -43,6 +44,7 @@ public class TransferProcess {
     private String agreementId;
     private String format;
     private String callbackAddress;
+    private TransferKind transferKind = TransferKind.Consumer;
 
     public String getId() {
         return id;
@@ -78,6 +80,14 @@ public class TransferProcess {
 
     public String getCallbackAddress() {
         return callbackAddress;
+    }
+
+    public String consumerPid() {
+        return transferKind.equals(TransferKind.Consumer) ? id : correlationId;
+    }
+
+    public String providerPid() {
+        return transferKind.equals(TransferKind.Provider) ? id : correlationId;
     }
 
     /**
@@ -147,6 +157,12 @@ public class TransferProcess {
         TERMINATED
     }
 
+
+    public enum TransferKind {
+        Consumer,
+        Provider
+    }
+
     public record DataAddress(String endpointType, String endpoint, Map<String, String> endpointProperties) {
 
     }
@@ -192,6 +208,11 @@ public class TransferProcess {
             return this;
         }
 
+        public Builder transferKind(TransferKind transferKind) {
+            process.transferKind = transferKind;
+            return this;
+        }
+
         public Builder callbackAddress(String callbackAddress) {
             process.callbackAddress = callbackAddress;
             return this;
@@ -199,6 +220,7 @@ public class TransferProcess {
 
         public TransferProcess build() {
             process.id = randomUUID().toString();
+            Objects.requireNonNull(process.transferKind, "Transfer kind must be set");
             return process;
         }
     }

@@ -24,6 +24,7 @@ import java.util.function.BiConsumer;
 
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.INITIALIZED;
+import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.STARTED;
 
 /**
  * Default mock consumer implementation.
@@ -47,8 +48,15 @@ public class ConsumerTransferProcessMockImpl extends AbstractTransferProcessMock
 
     @Override
     public void recordInitializedAction(BiConsumer<String, TransferProcess> action) {
-        recordAction(INITIALIZED, cn -> {
-            action.accept(baseAddress, cn);
+        recordAction(INITIALIZED, tp -> {
+            action.accept(baseAddress, tp);
+        });
+    }
+
+    @Override
+    public void recordStartedAction(BiConsumer<String, TransferProcess> action) {
+        recordAction(STARTED, tp -> {
+            action.accept(baseAddress, tp);
         });
     }
 

@@ -118,8 +118,12 @@ public abstract class AbstractAsyncPipeline<P extends AsyncPipeline<P>> implemen
     }
 
     protected void pause() {
+        pause(100);
+    }
+
+    protected void pause(long millis) {
         try {
-            Thread.sleep(100);
+            Thread.sleep(millis);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

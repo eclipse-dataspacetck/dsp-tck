@@ -24,7 +24,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.REQUESTED;
-import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.STARTED;
 
 /**
  * Default mock consumer implementation.
@@ -64,12 +63,4 @@ public class ProviderTransferProcessMockImpl extends AbstractTransferProcessMock
         executor.execute(() -> action.accept(transferProcess));
     }
 
-    @Override
-    public void started(TransferProcess transferProcess) {
-        var action = actions.getOrDefault(STARTED, EMPTY_QUEUE).poll();
-        if (action == null) {
-            return;
-        }
-        executor.execute(() -> action.accept(transferProcess));
-    }
 }

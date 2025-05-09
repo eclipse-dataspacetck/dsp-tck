@@ -14,7 +14,9 @@
 
 package org.eclipse.dataspacetck.dsp.system.mock.tp;
 
+import org.eclipse.dataspacetck.dsp.system.api.connector.tp.TransferProcessListener;
 import org.eclipse.dataspacetck.dsp.system.api.mock.tp.TransferProcessMock;
+import org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess;
 
 import java.util.ArrayDeque;
 import java.util.Map;
@@ -26,12 +28,13 @@ import java.util.concurrent.Executor;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State;
+import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.STARTED;
 import static org.mockito.internal.util.StringUtil.join;
 
 /**
  * Base negotiation mock functionality.
  */
-public abstract class AbstractTransferProcessMock implements TransferProcessMock {
+public abstract class AbstractTransferProcessMock implements TransferProcessMock, TransferProcessListener {
     protected static final Queue<Action> EMPTY_QUEUE = new ArrayDeque<>();
     protected Executor executor;
     protected Map<State, Queue<Action>> actions = new ConcurrentHashMap<>();
@@ -66,4 +69,12 @@ public abstract class AbstractTransferProcessMock implements TransferProcessMock
         actions.computeIfAbsent(state, k -> new ConcurrentLinkedQueue<>()).add(action);
     }
 
+    @Override
+    public void started(TransferProcess transferProcess) {
+        var action = actions.getOrDefault(STARTED, EMPTY_QUEUE).poll();
+        if (action == null) {
+            return;
+        }
+        executor.execute(() -> action.accept(transferProcess));
+    }
 }

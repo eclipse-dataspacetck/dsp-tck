@@ -12,16 +12,7 @@
  *
  */
 
-package org.eclipse.dataspacetck.dsp.system.client.tp;
+package org.eclipse.dataspacetck.dsp.verification.tp;
 
-/**
- * Proxy to the consumer connector being verified for transfer process.
- */
-public interface ConsumerTransferProcessClient extends TransferProcessClient {
-
-    /**
-     * Signals to the consumer connector to initiate a transfer request.
-     */
-    void initiateTransferRequest(String agreementId, String format);
-
+public class TransferProcessConsumer02TestTest extends TransferProcessConsumer02Test {
 }

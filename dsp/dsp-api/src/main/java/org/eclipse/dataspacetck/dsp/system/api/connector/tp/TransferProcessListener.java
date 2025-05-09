@@ -46,4 +46,18 @@ public interface TransferProcessListener {
     default void terminated(TransferProcess transferProcess) {
 
     }
+
+    /**
+     * Invoked when a transfer process has been completed.
+     */
+    default void completed(TransferProcess transferProcess) {
+
+    }
+
+    /**
+     * Invoked when a transfer process has been suspended.
+     */
+    default void suspended(TransferProcess transferProcess) {
+        
+    }
 }

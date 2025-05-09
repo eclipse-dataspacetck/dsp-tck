@@ -16,9 +16,6 @@ package org.eclipse.dataspacetck.dsp.system.api.connector.tp;
 
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess;
 
-import java.util.Map;
-import java.util.function.Predicate;
-
 /**
  * The ConsumerTransferProcessManager is responsible for managing transfer processes on the consumer side.
  * It handles the creation and management of transfer processes, including the initiation of transfers and
@@ -29,34 +26,18 @@ public interface ConsumerTransferProcessManager extends TransferProcessManager {
     /**
      * Creates a transfer process for the given agreement id and format.
      *
-     * @param agreementId the id of the agreement
-     * @param format      the format of the data
-     * @param dataAddress the data address of the data
+     * @param agreementId     the id of the agreement
+     * @param format          the format of the data
+     * @param providerBaseUrl the base URL of the provider
+     * @param dataAddress     the data address of the data
      * @return the created transfer process
      */
-    TransferProcess createTransferProcess(String agreementId, String format, TransferProcess.DataAddress dataAddress);
+    TransferProcess createTransferProcess(String agreementId, String format, String providerBaseUrl, TransferProcess.DataAddress dataAddress);
 
     /**
      * Called after a transfer has been requested and the transfer id is returned by the provider. The provider transfer process id
      * will be set as the correlation id on the consumer.
      */
     void transferRequested(String consumerId, String providerId);
-
-    /**
-     * Processes a transfer request received from the provider.
-     */
-    Map<String, Object> handleStart(Map<String, Object> startMessage, Predicate<TransferProcess.DataAddress> dataAddressPredicate);
-
-    /**
-     * Processes a transfer request received from the provider.
-     */
-    default Map<String, Object> handleStart(Map<String, Object> start) {
-        return handleStart(start, dataAddress -> true);
-    }
-
-    /**
-     * Processes a transfer termination message received from the provider.
-     */
-    Map<String, Object> handleTermination(Map<String, Object> terminatedMessage);
 
 }

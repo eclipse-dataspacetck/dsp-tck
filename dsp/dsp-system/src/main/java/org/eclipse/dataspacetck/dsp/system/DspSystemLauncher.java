@@ -37,9 +37,11 @@ import org.eclipse.dataspacetck.dsp.system.client.ConsumerNegotiationClientImpl;
 import org.eclipse.dataspacetck.dsp.system.client.ProviderNegotiationClient;
 import org.eclipse.dataspacetck.dsp.system.client.ProviderNegotiationClientImpl;
 import org.eclipse.dataspacetck.dsp.system.client.tp.ConsumerTransferProcessClient;
-import org.eclipse.dataspacetck.dsp.system.client.tp.ConsumerTransferProcessClientImpl;
 import org.eclipse.dataspacetck.dsp.system.client.tp.ProviderTransferProcessClient;
-import org.eclipse.dataspacetck.dsp.system.client.tp.ProviderTransferProcessClientImpl;
+import org.eclipse.dataspacetck.dsp.system.client.tp.http.HttpConsumerTransferProcessClient;
+import org.eclipse.dataspacetck.dsp.system.client.tp.http.HttpProviderTransferProcessClient;
+import org.eclipse.dataspacetck.dsp.system.client.tp.local.LocalConsumerTransferProcessClient;
+import org.eclipse.dataspacetck.dsp.system.client.tp.local.LocalProviderTransferProcessClient;
 import org.eclipse.dataspacetck.dsp.system.connector.TckConnector;
 import org.eclipse.dataspacetck.dsp.system.mock.ConsumerNegotiationMockImpl;
 import org.eclipse.dataspacetck.dsp.system.mock.NoOpConsumerNegotiationMock;
@@ -287,11 +289,12 @@ public class DspSystemLauncher implements SystemLauncher {
         return new ProviderTransferProcessPipelineImpl(negotiationClient,
                 callbackEndpoint,
                 consumerConnector,
+                baseConnectorUrl,
                 connectorUnderTestId,
                 monitor,
                 waitTime);
     }
-    
+
     private ConsumerTransferProcessClient createConsumerTransferProcessClientClient(String scopeId,
                                                                                     ServiceConfiguration configuration,
                                                                                     ServiceResolver resolver) {
@@ -300,11 +303,11 @@ public class DspSystemLauncher implements SystemLauncher {
             if (useLocalConnector) {
                 var consumerConnector = consumerConnectors.computeIfAbsent(scopeId, k2 -> new TckConnector(monitor));
                 var callbackEndpoint = (CallbackEndpoint) resolver.resolve(CallbackEndpoint.class, configuration);
-                return new ConsumerTransferProcessClientImpl(consumerConnector, monitor);
+                return new LocalConsumerTransferProcessClient(consumerConnector);
             }
             var callbackEndpoint = (CallbackEndpoint) resolver.resolve(CallbackEndpoint.class, configuration);
             assert callbackEndpoint != null;
-            return new ConsumerTransferProcessClientImpl(
+            return new HttpConsumerTransferProcessClient(
                     connectorTransferInitiateUrl,
                     callbackEndpoint.getAddress(),
                     monitor);
@@ -315,9 +318,9 @@ public class DspSystemLauncher implements SystemLauncher {
                                                                                     ServiceConfiguration configuration, ServiceResolver resolver) {
         return providerTransferClients.computeIfAbsent(scopeId, k -> {
             if (useLocalConnector) {
-                return new ProviderTransferProcessClientImpl(providerConnectors.computeIfAbsent(scopeId, k2 -> new TckConnector(monitor)), monitor);
+                return new LocalProviderTransferProcessClient(providerConnectors.computeIfAbsent(scopeId, k2 -> new TckConnector(monitor)));
             }
-            return new ProviderTransferProcessClientImpl(baseConnectorUrl, monitor);
+            return new HttpProviderTransferProcessClient(baseConnectorUrl, monitor);
         });
     }
 
