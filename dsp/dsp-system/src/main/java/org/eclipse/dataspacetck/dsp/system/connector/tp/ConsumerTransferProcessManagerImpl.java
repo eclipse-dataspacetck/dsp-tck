@@ -35,8 +35,10 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.ma
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringProperty;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createTransferResponse;
+import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.COMPLETED;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.REQUESTED;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.STARTED;
+import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.SUSPENDED;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.TERMINATED;
 
 /**
@@ -97,6 +99,34 @@ public class ConsumerTransferProcessManagerImpl extends AbstractTransferProcessM
         var transfer = findById(consumerId);
         transfer.transition(TERMINATED, p -> listeners.forEach(l -> l.terminated(transfer)));
         return createTransferResponse(transfer.getCorrelationId(), transfer.getId(), TERMINATED.toString());
+    }
+
+    @Override
+    public Map<String, Object> handleCompletion(Map<String, Object> completionMessage) {
+        var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, completionMessage);
+        monitor.debug("Received completion message: " + providerId);
+
+        var consumerId = stringIdProperty(DSPACE_PROPERTY_CONSUMER_PID_EXPANDED, completionMessage);
+        var transfer = findById(consumerId);
+        transfer.transition(COMPLETED, p -> listeners.forEach(l -> l.completed(transfer)));
+        return createTransferResponse(transfer.getCorrelationId(), transfer.getId(), COMPLETED.toString());
+    }
+
+    @Override
+    public Map<String, Object> handleSuspension(Map<String, Object> suspensionMessage) {
+        var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, suspensionMessage);
+        monitor.debug("Received completion message: " + providerId);
+
+        var consumerId = stringIdProperty(DSPACE_PROPERTY_CONSUMER_PID_EXPANDED, suspensionMessage);
+        var transfer = findById(consumerId);
+        transfer.transition(SUSPENDED, p -> listeners.forEach(l -> l.suspended(transfer)));
+        return createTransferResponse(transfer.getCorrelationId(), transfer.getId(), SUSPENDED.toString());
+    }
+
+    @Override
+    public void terminated(String providerId) {
+        var transfer = findById(providerId);
+        transfer.transition(TERMINATED);
     }
 
     private TransferProcess.DataAddress toDataAddress(Map<String, Object> dataAddress) {

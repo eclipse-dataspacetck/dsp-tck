@@ -31,9 +31,10 @@ import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.serial
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_NAMESPACE;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createCompletion;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createStartRequest;
+import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createSuspension;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createTermination;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ConsumerTransferProcessPipelineImpl extends AbstractTransferProcessPipeline<ConsumerTransferProcessPipeline> implements ConsumerTransferProcessPipeline {
 
@@ -118,14 +119,41 @@ public class ConsumerTransferProcessPipelineImpl extends AbstractTransferProcess
     }
 
     @Override
-    public ConsumerTransferProcessPipeline thenVerifyConsumerState(TransferProcess.State state) {
+    public ConsumerTransferProcessPipeline sendSuspension(boolean expectError) {
         stages.add(() -> {
-            pause();
+            var providerId = transferProcess.getId();
+            var consumerId = transferProcess.getCorrelationId();
+            var suspension = createSuspension(providerId, consumerId, "1");
+            monitor.debug("Sending transfer suspension");
+            var consumerAddress = transferProcess.getCallbackAddress();
+            transferProcessClient.suspendTransfer(consumerId, suspension, consumerAddress, expectError);
+            providerConnector.getProviderTransferProcessManager().suspended(providerId);
+        });
+        return this;
+    }
+
+    @Override
+    public ConsumerTransferProcessPipeline thenVerifyConsumerState(TransferProcess.State state) {
+        thenWait("for consumer transfer process state to be " + state, () -> {
             var callbackAddress = transferProcess.getCallbackAddress();
             var processId = this.transferProcess.getCorrelationId();
             var negotiation = transferProcessClient.getTransferProcess(processId, callbackAddress);
             var actual = stringIdProperty(DSPACE_PROPERTY_STATE_EXPANDED, negotiation);
-            assertEquals(DSPACE_NAMESPACE + state.toString(), actual);
+            return (DSPACE_NAMESPACE + state.toString()).equals(actual);
+        });
+        return this;
+    }
+
+    @Override
+    public ConsumerTransferProcessPipeline sendCompletion(boolean expectError) {
+        stages.add(() -> {
+            var providerId = transferProcess.getId();
+            var consumerId = transferProcess.getCorrelationId();
+            var completion = createCompletion(providerId, consumerId);
+            monitor.debug("Sending transfer completion");
+            var consumerAddress = transferProcess.getCallbackAddress();
+            transferProcessClient.completeTransfer(consumerId, completion, consumerAddress, expectError);
+            providerConnector.getProviderTransferProcessManager().completed(providerId);
         });
         return this;
     }

@@ -37,4 +37,19 @@ public interface ProviderTransferProcessManager extends TransferProcessManager {
      * Transition to the "terminated" state.
      */
     void terminated(String providerId);
+
+    /**
+     * Transition to the "completed" state.
+     */
+    void completed(String providerId);
+
+    /**
+     * Transition to the "suspended" state.
+     */
+    void suspended(String providerId);
+
+    /**
+     * Processes a transfer termination message received from the provider.
+     */
+    Map<String, Object> handleTermination(Map<String, Object> terminatedMessage);
 }

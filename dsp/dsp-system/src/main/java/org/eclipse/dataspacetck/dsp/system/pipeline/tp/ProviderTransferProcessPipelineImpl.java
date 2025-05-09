@@ -31,6 +31,7 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPAC
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_PROVIDER_PID_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createTermination;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createTransferRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -38,6 +39,8 @@ public class ProviderTransferProcessPipelineImpl extends AbstractTransferProcess
 
     private static final String TRANSFER_START_PATH = "/transfers/[^/]+/start";
     private static final String TRANSFER_TERMINATION_PATH = "/transfers/[^/]+/termination";
+    private static final String TRANSFER_COMPLETION_PATH = "/transfers/[^/]+/completion";
+    private static final String TRANSFER_SUSPENSION_PATH = "/transfers/[^/]+/suspension";
 
 
     private final ProviderTransferProcessClient transferProcessClient;
@@ -71,6 +74,20 @@ public class ProviderTransferProcessPipelineImpl extends AbstractTransferProcess
     }
 
     @Override
+    public ProviderTransferProcessPipeline sendTermination(boolean expectError) {
+        stages.add(() -> {
+            var providerId = transferProcess.getId();
+            var consumerId = transferProcess.getCorrelationId();
+            var terminationMessage = createTermination(providerId, consumerId, "1");
+            monitor.debug("Sending transfer termination");
+            var consumerAddress = transferProcess.getCallbackAddress();
+            transferProcessClient.terminateTransfer(consumerId, terminationMessage, consumerAddress, expectError);
+            consumerConnector.getConsumerTransferProcessManager().terminated(providerId);
+        });
+        return this;
+    }
+
+    @Override
     public ProviderTransferProcessPipeline expectStartMessage(Function<Map<String, Object>, Map<String, Object>> action) {
         var latch = new CountDownLatch(1);
         expectLatches.add(latch);
@@ -92,6 +109,36 @@ public class ProviderTransferProcessPipelineImpl extends AbstractTransferProcess
                 endpoint.registerHandler(TRANSFER_TERMINATION_PATH, offer -> {
                     var transfer = action.apply((processJsonLd(offer)));
                     endpoint.deregisterHandler(TRANSFER_TERMINATION_PATH);
+                    latch.countDown();
+                    return serialize(transfer);
+                }));
+
+        return this;
+    }
+
+    @Override
+    public ProviderTransferProcessPipeline expectCompletionMessage(Function<Map<String, Object>, Map<String, Object>> action) {
+        var latch = new CountDownLatch(1);
+        expectLatches.add(latch);
+        stages.add(() ->
+                endpoint.registerHandler(TRANSFER_COMPLETION_PATH, offer -> {
+                    var transfer = action.apply((processJsonLd(offer)));
+                    endpoint.deregisterHandler(TRANSFER_COMPLETION_PATH);
+                    latch.countDown();
+                    return serialize(transfer);
+                }));
+
+        return this;
+    }
+
+    @Override
+    public ProviderTransferProcessPipeline expectSuspensionMessage(Function<Map<String, Object>, Map<String, Object>> action) {
+        var latch = new CountDownLatch(1);
+        expectLatches.add(latch);
+        stages.add(() ->
+                endpoint.registerHandler(TRANSFER_SUSPENSION_PATH, offer -> {
+                    var transfer = action.apply((processJsonLd(offer)));
+                    endpoint.deregisterHandler(TRANSFER_SUSPENSION_PATH);
                     latch.countDown();
                     return serialize(transfer);
                 }));

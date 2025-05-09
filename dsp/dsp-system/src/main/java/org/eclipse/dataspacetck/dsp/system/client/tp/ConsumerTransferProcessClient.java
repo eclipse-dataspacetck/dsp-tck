@@ -46,6 +46,27 @@ public interface ConsumerTransferProcessClient {
      */
     void terminateTransfer(String consumerId, Map<String, Object> terminationMessage, String callbackAddress, boolean expectError);
 
+
+    /**
+     * Sends a transfer complete message to the consumer connector.
+     *
+     * @param consumerId        the ID of the consumer
+     * @param completionMessage the transfer termination message
+     * @param callbackAddress   the callback address
+     * @param expectError       whether to expect an error
+     */
+    void completeTransfer(String consumerId, Map<String, Object> completionMessage, String callbackAddress, boolean expectError);
+
+    /**
+     * Sends a transfer suspension message to the consumer connector.
+     *
+     * @param consumerId        the ID of the consumer
+     * @param suspensionMessage the transfer termination message
+     * @param callbackAddress   the callback address
+     * @param expectError       whether to expect an error
+     */
+    void suspendTransfer(String consumerId, Map<String, Object> suspensionMessage, String callbackAddress, boolean expectError);
+
     /**
      * Retrieves the transfer process from the consumer connector.
      */

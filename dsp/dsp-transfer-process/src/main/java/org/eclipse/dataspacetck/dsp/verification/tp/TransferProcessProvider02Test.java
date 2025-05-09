@@ -30,11 +30,11 @@ import static org.eclipse.dataspacetck.dsp.verification.tp.ProviderActions.postS
 import static org.eclipse.dataspacetck.dsp.verification.tp.ProviderActions.postTerminate;
 
 @Tag("base-compliance")
-@DisplayName("TP_01: Transfer request scenarios")
-public class TransferProcessProvider01Test extends AbstractTransferProcessProviderTest {
+@DisplayName("TP_02: Transfer request scenarios")
+public class TransferProcessProvider02Test extends AbstractTransferProcessProviderTest {
 
     @MandatoryTest
-    @DisplayName("TP:01-01: Verify transfer request, provider started, provider terminated")
+    @DisplayName("TP:02-01: Verify transfer request, provider started, consumer terminated")
     @TestSequenceDiagram("""
             participant TCK as Technology Compatibility Kit (consumer)
             participant CUT as Connector Under Test (provider)
@@ -45,22 +45,18 @@ public class TransferProcessProvider01Test extends AbstractTransferProcessProvid
             CUT->>TCK: TransferStartMessage
             TCK-->>CUT: 200 OK
             
-            CUT->>TCK: TransferTerminationMessage
-            TCK-->>CUT: 200 OK
+            TCK->>CUT: TransferTerminationMessage
+            CUT-->>TCK: 200 OK
             """)
-    public void tp_01_01() {
+    public void tp_02_01() {
 
-        transferProcessMock.recordTransferRequestedAction(transferProcess -> {
-            postStartTransfer(transferProcess);
-            pause();
-            postTerminate(transferProcess);
-        });
+        transferProcessMock.recordTransferRequestedAction(ProviderActions::postStartTransfer);
 
         transferProcessPipeline
                 .expectStartMessage(start -> consumerConnector.getConsumerTransferProcessManager().handleStart(start))
                 .sendTransferRequest(agreementId, format)
                 .thenWaitForState(STARTED)
-                .expectTerminationMessage(terminated -> consumerConnector.getConsumerTransferProcessManager().handleTermination(terminated))
+                .sendTermination()
                 .thenWaitForState(TERMINATED)
                 .thenVerifyProviderState(TERMINATED)
                 .execute();
@@ -69,7 +65,7 @@ public class TransferProcessProvider01Test extends AbstractTransferProcessProvid
     }
 
     @MandatoryTest
-    @DisplayName("TP:01-02: Verify transfer request, provider started, provider completed")
+    @DisplayName("TP:02-02: Verify transfer request, provider started, provider completed")
     @TestSequenceDiagram("""
             participant TCK as Technology Compatibility Kit (consumer)
             participant CUT as Connector Under Test (provider)
@@ -83,7 +79,7 @@ public class TransferProcessProvider01Test extends AbstractTransferProcessProvid
             CUT->>TCK: TransferCompletionMessage
             TCK-->>CUT: 200 OK
             """)
-    public void tp_01_02() {
+    public void tp_02_02() {
 
         transferProcessMock.recordTransferRequestedAction(transferProcess -> {
             postStartTransfer(transferProcess);
@@ -104,7 +100,7 @@ public class TransferProcessProvider01Test extends AbstractTransferProcessProvid
     }
 
     @MandatoryTest
-    @DisplayName("TP:01-03: Verify transfer request, provider started, provider suspended, provider terminated")
+    @DisplayName("TP:02-03: Verify transfer request, provider started, provider suspended, provider terminated")
     @TestSequenceDiagram("""
             participant TCK as Technology Compatibility Kit (consumer)
             participant CUT as Connector Under Test (provider)
@@ -121,7 +117,7 @@ public class TransferProcessProvider01Test extends AbstractTransferProcessProvid
             CUT->>TCK: TransferTerminationMessage
             TCK-->>CUT: 200 OK
             """)
-    public void tp_01_03() {
+    public void tp_02_03() {
 
         transferProcessMock.recordTransferRequestedAction(transferProcess -> {
             postStartTransfer(transferProcess);
@@ -146,7 +142,7 @@ public class TransferProcessProvider01Test extends AbstractTransferProcessProvid
     }
 
     @MandatoryTest
-    @DisplayName("TP:01-04: Verify transfer request, provider started, provider suspended, provider started, provider completed")
+    @DisplayName("TP:02-04: Verify transfer request, provider started, provider suspended, provider started, provider completed")
     @TestSequenceDiagram("""
             participant TCK as Technology Compatibility Kit (consumer)
             participant CUT as Connector Under Test (provider)
@@ -167,7 +163,7 @@ public class TransferProcessProvider01Test extends AbstractTransferProcessProvid
             TCK-->>CUT: 200 OK
             
             """)
-    public void tp_01_04() {
+    public void tp_02_04() {
 
         transferProcessMock.recordTransferRequestedAction(transferProcess -> {
             postStartTransfer(transferProcess);
@@ -196,7 +192,7 @@ public class TransferProcessProvider01Test extends AbstractTransferProcessProvid
     }
 
     @MandatoryTest
-    @DisplayName("TP:01-05: Verify transfer request, provider terminated")
+    @DisplayName("TP:02-05: Verify transfer request, provider terminated")
     @TestSequenceDiagram("""
             participant TCK as Technology Compatibility Kit (consumer)
             participant CUT as Connector Under Test (provider)
@@ -207,7 +203,7 @@ public class TransferProcessProvider01Test extends AbstractTransferProcessProvid
             CUT->>TCK: TransferTerminatedMessage
             TCK-->>CUT: 200 OK
             """)
-    public void tp_01_05() {
+    public void tp_02_05() {
 
         transferProcessMock.recordTransferRequestedAction(ProviderActions::postTerminate);
 

@@ -59,4 +59,18 @@ public interface ConsumerTransferProcessManager extends TransferProcessManager {
      */
     Map<String, Object> handleTermination(Map<String, Object> terminatedMessage);
 
+    /**
+     * Processes a transfer completion message received from the provider.
+     */
+    Map<String, Object> handleCompletion(Map<String, Object> completionMessage);
+
+    /**
+     * Processes a transfer suspension message received from the provider.
+     */
+    Map<String, Object> handleSuspension(Map<String, Object> suspensionMessage);
+
+    /**
+     * Transition to the "terminated" state.
+     */
+    void terminated(String providerId);
 }

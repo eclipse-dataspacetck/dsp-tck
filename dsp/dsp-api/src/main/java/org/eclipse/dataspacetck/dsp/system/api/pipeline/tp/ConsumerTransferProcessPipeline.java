@@ -56,6 +56,27 @@ public interface ConsumerTransferProcessPipeline extends TransferProcessPipeline
      */
     ConsumerTransferProcessPipeline sendStarted(Map<String, Object> dataAddress);
 
+    /**
+     * Sends a completion event to the consumer connector being verified.
+     *
+     * @return this pipeline instance
+     */
+    ConsumerTransferProcessPipeline sendCompletion(boolean expectError);
+
+    /**
+     * Sends a completion event to the consumer connector being verified.
+     *
+     * @return this pipeline instance
+     */
+    default ConsumerTransferProcessPipeline sendCompletion() {
+        return sendCompletion(false);
+    }
+
+    /**
+     * Sends a termination event to the consumer connector being verified.
+     * <p>
+     * * @return this pipeline instance
+     */
     default ConsumerTransferProcessPipeline sendTermination() {
         return sendTermination(false);
     }
@@ -67,6 +88,24 @@ public interface ConsumerTransferProcessPipeline extends TransferProcessPipeline
      * @return this pipeline instance
      */
     ConsumerTransferProcessPipeline sendTermination(boolean expectError);
+
+
+    /**
+     * Sends a suspension event to the consumer connector being verified.
+     *
+     * @param expectError whether to expect an error
+     * @return this pipeline instance
+     */
+    ConsumerTransferProcessPipeline sendSuspension(boolean expectError);
+
+    /**
+     * Sends a suspension event to the consumer connector being verified.
+     *
+     * @return this pipeline instance
+     */
+    default ConsumerTransferProcessPipeline sendSuspension() {
+        return sendSuspension(false);
+    }
 
     /**
      * Verifies the active consumer transfer process is in the given state.

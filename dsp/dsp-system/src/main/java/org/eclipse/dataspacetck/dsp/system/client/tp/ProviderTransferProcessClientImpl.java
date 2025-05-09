@@ -32,6 +32,7 @@ public class ProviderTransferProcessClientImpl implements ProviderTransferProces
 
     private static final String REQUEST_PATH = "transfers/request";
     private static final String GET_PATH = "transfers/%s";
+    private static final String TERMINATION_PATH = "%s/transfers/%s/termination";
 
     private final Monitor monitor;
     private Connector systemConnector;
@@ -88,6 +89,18 @@ public class ProviderTransferProcessClientImpl implements ProviderTransferProces
                 var state = stringIdProperty(DSPACE_PROPERTY_STATE_EXPANDED, jsonResponse);
                 monitor.debug(format("Received transfer status response with state %s: %s", state, providerId));
                 return jsonResponse;
+            }
+        }
+    }
+
+    @Override
+    public void terminateTransfer(String consumerId, Map<String, Object> terminationMessage, String callbackAddress, boolean expectError) {
+        var compacted = processJsonLd(terminationMessage);
+        if (systemConnector != null) {
+            systemConnector.getProviderTransferProcessManager().handleTermination(compacted);
+        } else {
+            try (var response = postJson(format(TERMINATION_PATH, callbackAddress, consumerId), terminationMessage, expectError)) {
+                monitor.debug("Received termination request response");
             }
         }
     }

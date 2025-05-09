@@ -33,6 +33,8 @@ public class ConsumerTransferProcessClientImpl implements ConsumerTransferProces
 
     private static final String START_PATH = "%s/transfers/%s/start";
     private static final String TERMINATION_PATH = "%s/transfers/%s/termination";
+    private static final String COMPLETION_PATH = "%s/transfers/%s/completion";
+    private static final String SUSPENSION_PATH = "%s/transfers/%s/suspension";
 
     private static final String GET_PATH = "%s/transfers/%s";
 
@@ -85,6 +87,30 @@ public class ConsumerTransferProcessClientImpl implements ConsumerTransferProces
         } else {
             try (var response = postJson(format(TERMINATION_PATH, callbackAddress, consumerId), terminationMessage, expectError)) {
                 monitor.debug("Received termination request response");
+            }
+        }
+    }
+
+    @Override
+    public void completeTransfer(String consumerId, Map<String, Object> completionMessage, String callbackAddress, boolean expectError) {
+        var compacted = processJsonLd(completionMessage);
+        if (systemConnector != null) {
+            systemConnector.getConsumerTransferProcessManager().handleCompletion(compacted);
+        } else {
+            try (var response = postJson(format(COMPLETION_PATH, callbackAddress, consumerId), completionMessage, expectError)) {
+                monitor.debug("Received completion request response");
+            }
+        }
+    }
+
+    @Override
+    public void suspendTransfer(String consumerId, Map<String, Object> suspensionMessage, String callbackAddress, boolean expectError) {
+        var compacted = processJsonLd(suspensionMessage);
+        if (systemConnector != null) {
+            systemConnector.getConsumerTransferProcessManager().handleSuspension(compacted);
+        } else {
+            try (var response = postJson(format(SUSPENSION_PATH, callbackAddress, consumerId), suspensionMessage, expectError)) {
+                monitor.debug("Received suspension request response");
             }
         }
     }

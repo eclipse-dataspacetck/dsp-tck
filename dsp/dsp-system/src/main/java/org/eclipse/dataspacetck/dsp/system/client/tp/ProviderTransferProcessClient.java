@@ -20,7 +20,7 @@ import java.util.Map;
  * Proxy to the provider connector being verified for transfer process.
  */
 public interface ProviderTransferProcessClient {
-    
+
     /**
      * Sends a transfer request to the provider connector.
      */
@@ -32,4 +32,14 @@ public interface ProviderTransferProcessClient {
      */
     Map<String, Object> getTransferProcess(String providerId);
 
+
+    /**
+     * Sends a transfer start message to the consumer connector.
+     *
+     * @param consumerId         the ID of the consumer
+     * @param terminationMessage the transfer termination message
+     * @param callbackAddress    the callback address
+     * @param expectError        whether to expect an error
+     */
+    void terminateTransfer(String consumerId, Map<String, Object> terminationMessage, String callbackAddress, boolean expectError);
 }

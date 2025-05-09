@@ -22,10 +22,13 @@ import java.util.Map;
 
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_CALLBACK_ADDRESS_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_CONSUMER_PID_EXPANDED;
+import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_PROVIDER_PID_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringProperty;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createTransferResponse;
+import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.COMPLETED;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.STARTED;
+import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.SUSPENDED;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.TERMINATED;
 
 public class ProviderTransferProcessManagerImpl extends AbstractTransferProcessManager implements ProviderTransferProcessManager {
@@ -66,5 +69,28 @@ public class ProviderTransferProcessManagerImpl extends AbstractTransferProcessM
     public void terminated(String providerId) {
         var transfer = findById(providerId);
         transfer.transition(TERMINATED);
+    }
+
+    @Override
+    public void completed(String providerId) {
+        var transfer = findById(providerId);
+        transfer.transition(COMPLETED);
+    }
+
+    @Override
+    public void suspended(String providerId) {
+        var transfer = findById(providerId);
+        transfer.transition(SUSPENDED);
+    }
+
+    @Override
+    public Map<String, Object> handleTermination(Map<String, Object> terminatedMessage) {
+        var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, terminatedMessage);
+        monitor.debug("Received terminated message: " + providerId);
+
+        var consumerId = stringIdProperty(DSPACE_PROPERTY_CONSUMER_PID_EXPANDED, terminatedMessage);
+        var transfer = findById(consumerId);
+        transfer.transition(TERMINATED, p -> listeners.forEach(l -> l.terminated(transfer)));
+        return createTransferResponse(transfer.getCorrelationId(), transfer.getId(), TERMINATED.toString());
     }
 }

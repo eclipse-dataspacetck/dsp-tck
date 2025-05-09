@@ -32,4 +32,5 @@ public abstract class AbstractTransferProcessPipeline<P extends TransferProcessP
     public P thenWaitForState(State state) {
         return thenWait("state to transition to " + state, () -> transferProcess != null && state == transferProcess.getState());
     }
+    
 }
