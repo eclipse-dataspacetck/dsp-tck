@@ -17,6 +17,7 @@ package org.eclipse.dataspacetck.dsp.system.connector.tp;
 import org.eclipse.dataspacetck.core.spi.boot.Monitor;
 import org.eclipse.dataspacetck.dsp.system.api.connector.tp.TransferProcessListener;
 import org.eclipse.dataspacetck.dsp.system.api.connector.tp.TransferProcessManager;
+import org.eclipse.dataspacetck.dsp.system.api.service.Result;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +28,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static java.lang.String.format;
@@ -39,7 +41,9 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPAC
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.mapProperty;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createTransferErrorResponse;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createTransferResponse;
+import static org.eclipse.dataspacetck.dsp.system.api.service.Result.ErrorType.CONFLICT;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.COMPLETED;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.STARTED;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State.SUSPENDED;
@@ -107,13 +111,15 @@ public abstract class AbstractTransferProcessManager implements TransferProcessM
     }
 
     @Override
-    public Map<String, Object> handleCompletion(Map<String, Object> completionMessage) {
+    public Result<Map<String, Object>, Map<String, Object>> handleCompletion(Map<String, Object> completionMessage) {
         var ids = parseId(completionMessage);
         monitor.debug(format("Received completion message: %s with correlation id %s", ids.id, ids.correlationId));
 
         var transfer = findById(ids.id);
-        transfer.transition(COMPLETED, p -> listeners.forEach(l -> l.completed(transfer)));
-        return createTransferResponse(transfer.getCorrelationId(), transfer.getId(), COMPLETED.toString());
+        return withStateTransition(transfer, (tp) -> {
+            tp.transition(COMPLETED, p -> listeners.forEach(l -> l.completed(p)));
+            return createTransferResponse(tp.providerPid(), tp.consumerPid(), COMPLETED.toString());
+        });
     }
 
     @Override
@@ -122,20 +128,22 @@ public abstract class AbstractTransferProcessManager implements TransferProcessM
         monitor.debug(format("Received terminated message: %s with correlation id %s", ids.id, ids.correlationId));
         var transfer = findById(ids.id);
         transfer.transition(TERMINATED, p -> listeners.forEach(l -> l.terminated(transfer)));
-        return createTransferResponse(transfer.getCorrelationId(), transfer.getId(), TERMINATED.toString());
+        return createTransferResponse(transfer.providerPid(), transfer.consumerPid(), TERMINATED.toString());
     }
 
     @Override
-    public Map<String, Object> handleSuspension(Map<String, Object> suspensionMessage) {
+    public Result<Map<String, Object>, Map<String, Object>> handleSuspension(Map<String, Object> suspensionMessage) {
         var ids = parseId(suspensionMessage);
         monitor.debug(format("Received suspension message: %s with correlation id %s", ids.id, ids.correlationId));
         var transfer = findById(ids.id);
-        transfer.transition(SUSPENDED, p -> listeners.forEach(l -> l.suspended(transfer)));
-        return createTransferResponse(transfer.getCorrelationId(), transfer.getId(), SUSPENDED.toString());
+        return withStateTransition(transfer, tp -> {
+            tp.transition(SUSPENDED, p -> listeners.forEach(l -> l.suspended(p)));
+            return createTransferResponse(tp.providerPid(), tp.consumerPid(), SUSPENDED.toString());
+        });
     }
 
     @Override
-    public Map<String, Object> handleStart(Map<String, Object> startMessage, Predicate<TransferProcess.DataAddress> test) {
+    public Result<Map<String, Object>, Map<String, Object>> handleStart(Map<String, Object> startMessage, Predicate<TransferProcess.DataAddress> test) {
         var ids = parseId(startMessage);
         monitor.debug(format("Received start message: %s with correlation id %s", ids.id, ids.correlationId));
 
@@ -146,9 +154,12 @@ public abstract class AbstractTransferProcessManager implements TransferProcessM
             throw new AssertionError("Data address predicate failed");
         }
         var transfer = findById(ids.id);
-        transfer.setDataAddress(dataAddress);
-        transfer.transition(STARTED, p -> listeners.forEach(l -> l.started(transfer)));
-        return createTransferResponse(transfer.getCorrelationId(), transfer.getId(), STARTED.toString());
+
+        return withStateTransition(transfer, tp -> {
+            tp.setDataAddress(dataAddress);
+            tp.transition(STARTED, p -> listeners.forEach(l -> l.started(p)));
+            return createTransferResponse(tp.providerPid(), tp.consumerPid(), STARTED.toString());
+        });
     }
 
     private TransferProcess.DataAddress toDataAddress(Map<String, Object> dataAddress) {
@@ -181,8 +192,18 @@ public abstract class AbstractTransferProcessManager implements TransferProcessM
         return properties;
     }
 
+    protected Result<Map<String, Object>, Map<String, Object>> withStateTransition(TransferProcess tp, Function<TransferProcess, Map<String, Object>> stateTransition) {
+        try {
+            return Result.success(stateTransition.apply(tp));
+        } catch (IllegalStateException e) {
+            return Result.failure(createTransferErrorResponse(tp.providerPid(), tp.consumerPid(), "409", e.getMessage()), CONFLICT);
+        }
+    }
+
     protected abstract TransferId parseId(Map<String, Object> message);
 
     protected record TransferId(String id, String correlationId) {
     }
+
+
 }

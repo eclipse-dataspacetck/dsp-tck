@@ -15,6 +15,7 @@
 package org.eclipse.dataspacetck.dsp.system.api.pipeline.tp;
 
 import org.eclipse.dataspacetck.core.api.pipeline.AsyncPipeline;
+import org.eclipse.dataspacetck.dsp.system.api.service.Result;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State;
 
 import java.util.Map;
@@ -89,7 +90,25 @@ public interface TransferProcessPipeline<P extends TransferProcessPipeline<P>> e
      * @return this pipeline instance
      */
     default P sendStarted() {
-        return sendStarted(null);
+        return sendStarted(null, false);
+    }
+
+    /**
+     * Sends a transfer request to the counter-party connector being verified.
+     *
+     * @return this pipeline instance
+     */
+    default P sendStarted(boolean expectError) {
+        return sendStarted(null, expectError);
+    }
+
+    /**
+     * Sends a transfer request to the counter-party connector being verified.
+     *
+     * @return this pipeline instance
+     */
+    default P sendStarted(Map<String, Object> dataAddress) {
+        return sendStarted(dataAddress, false);
     }
 
     /**
@@ -98,7 +117,7 @@ public interface TransferProcessPipeline<P extends TransferProcessPipeline<P>> e
      * @param dataAddress the data address to send
      * @return this pipeline instance
      */
-    P sendStarted(Map<String, Object> dataAddress);
+    P sendStarted(Map<String, Object> dataAddress, boolean expectError);
 
 
     /**
@@ -107,7 +126,7 @@ public interface TransferProcessPipeline<P extends TransferProcessPipeline<P>> e
      * @param action the action to execute
      * @return this pipeline instance
      */
-    P expectStartMessage(Function<Map<String, Object>, Map<String, Object>> action);
+    P expectStartMessage(Function<Map<String, Object>, Result<Map<String, Object>, Map<String, Object>>> action);
 
     /**
      * Expects a transfer termination message and executes the given action.
@@ -123,7 +142,7 @@ public interface TransferProcessPipeline<P extends TransferProcessPipeline<P>> e
      * @param action the action to execute
      * @return this pipeline instance
      */
-    P expectCompletionMessage(Function<Map<String, Object>, Map<String, Object>> action);
+    P expectCompletionMessage(Function<Map<String, Object>, Result<Map<String, Object>, Map<String, Object>>> action);
 
     /**
      * Expects a transfer suspension message and executes the given action.
@@ -131,5 +150,5 @@ public interface TransferProcessPipeline<P extends TransferProcessPipeline<P>> e
      * @param action the action to execute
      * @return this pipeline instance
      */
-    P expectSuspensionMessage(Function<Map<String, Object>, Map<String, Object>> action);
+    P expectSuspensionMessage(Function<Map<String, Object>, Result<Map<String, Object>, Map<String, Object>>> action);
 }

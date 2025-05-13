@@ -64,10 +64,16 @@ public class ConsumerActions {
     }
 
     public static void postComplete(String baseUrl, TransferProcess transferProcess) {
+        postComplete(baseUrl, transferProcess, false);
+    }
+
+    public static void postComplete(String baseUrl, TransferProcess transferProcess, boolean expectError) {
         var completion = createCompletion(transferProcess.providerPid(), transferProcess.consumerPid());
-        transferProcess.transition(TransferProcess.State.COMPLETED);
-        try (var response = postJson(format(TRANSFER_COMPLETION_PATH, baseUrl, transferProcess.getCorrelationId()), completion)) {
-            checkResponse(response);
+        if (!expectError) {
+            transferProcess.transition(TransferProcess.State.COMPLETED);
+        }
+        try (var response = postJson(format(TRANSFER_COMPLETION_PATH, baseUrl, transferProcess.getCorrelationId()), completion, expectError)) {
+            checkResponse(response, expectError);
         }
     }
 
@@ -79,19 +85,42 @@ public class ConsumerActions {
         }
     }
 
+    public static void postSuspend(String baseUrl, TransferProcess transferProcess, boolean expectError) {
+        var suspension = createTermination(transferProcess.providerPid(), transferProcess.consumerPid(), "1");
+
+        if (!expectError) {
+            transferProcess.transition(TransferProcess.State.SUSPENDED);
+        }
+        try (var response = postJson(format(TRANSFER_SUSPENSION_PATH, baseUrl, transferProcess.getCorrelationId()), suspension, expectError)) {
+            checkResponse(response, expectError);
+        }
+    }
+
     public static void postStartTransfer(String baseUrl, TransferProcess transferProcess) {
+        postStartTransfer(baseUrl, transferProcess, false);
+    }
+
+    public static void postStartTransfer(String baseUrl, TransferProcess transferProcess, boolean expectError) {
         var message = createStartRequest(transferProcess.providerPid(), transferProcess.consumerPid(), null);
-        transferProcess.transition(TransferProcess.State.STARTED);
+        if (!expectError) {
+            transferProcess.transition(TransferProcess.State.STARTED);
+        }
         var url = format(TRANSFER_START_PATH, baseUrl, transferProcess.getCorrelationId());
-        try (var response = postJson(url, message)) {
-            checkResponse(response);
+        try (var response = postJson(url, message, expectError)) {
+            checkResponse(response, expectError);
+        }
+    }
+
+    private static void checkResponse(Response response, boolean expectError) {
+        if (expectError && response.isSuccessful()) {
+            throw new AssertionError("Expected error response but got: " + response.code());
+        } else if (!expectError && !response.isSuccessful()) {
+            throw new AssertionError("Unexpected response code: " + response.code());
         }
     }
 
     private static void checkResponse(Response response) {
-        if (!response.isSuccessful()) {
-            throw new AssertionError("Unexpected response code: " + response.code());
-        }
+        checkResponse(response, false);
     }
 
 }

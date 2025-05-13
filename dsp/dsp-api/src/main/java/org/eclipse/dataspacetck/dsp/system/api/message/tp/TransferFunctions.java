@@ -72,6 +72,20 @@ public class TransferFunctions {
         return message;
     }
 
+    public static Map<String, Object> createTransferErrorResponse(String providerPid, String consumerPid, String code, String... reasons) {
+        var message = createBaseMessage("TransferError");
+        var context = createDspContext();
+        message.put(CONTEXT, context);
+        message.put(DSPACE_PROPERTY_PROVIDER_PID, providerPid);
+        message.put(DSPACE_PROPERTY_CONSUMER_PID, consumerPid);
+        message.put(DSPACE_PROPERTY_CODE, code);
+
+        if (reasons != null && reasons.length > 0) {
+            message.put(DSPACE_PROPERTY_REASON, Arrays.stream(reasons).map(reason -> Map.of("message", reason)).collect(toList()));
+        }
+        return message;
+    }
+
     public static Map<String, Object> createStartRequest(String providerId,
                                                          String consumerId,
                                                          Map<String, Object> dataAddress) {

@@ -160,7 +160,7 @@ public class TransferProcessProvider01Test extends AbstractTransferProcessProvid
             CUT->>TCK: TransferSuspensionMessage
             TCK-->>CUT: 200 OK
             
-            CUT->>TCK: TransferStartedMessage
+            CUT->>TCK: TransferStartMessage
             TCK-->>CUT: 200 OK
             
             CUT->>TCK: TransferCompletionMessage
@@ -204,7 +204,7 @@ public class TransferProcessProvider01Test extends AbstractTransferProcessProvid
             TCK->>CUT: TransferRequestMessage
             CUT-->>TCK: TransferProcess
             
-            CUT->>TCK: TransferTerminatedMessage
+            CUT->>TCK: TransferTerminationMessage
             TCK-->>CUT: 200 OK
             """)
     public void tp_01_05() {

@@ -165,7 +165,7 @@ public class TransferProcessConsumer02Test extends AbstractTransferProcessConsum
             CUT->>TCK: TransferSuspensionMessage
             TCK-->>CUT: 200 OK
             
-            CUT->>TCK: TransferStartedMessage
+            CUT->>TCK: TransferStartMessage
             TCK-->>CUT: 200 OK
             
             CUT->>TCK: TransferCompletionMessage

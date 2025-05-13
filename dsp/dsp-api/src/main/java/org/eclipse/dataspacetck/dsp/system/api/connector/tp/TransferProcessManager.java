@@ -14,6 +14,7 @@
 
 package org.eclipse.dataspacetck.dsp.system.api.connector.tp;
 
+import org.eclipse.dataspacetck.dsp.system.api.service.Result;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,11 +68,11 @@ public interface TransferProcessManager {
      * Transition to the "started" state.
      */
     void started(String providerId);
-    
+
     /**
      * Processes a transfer completion message received from the counter-party.
      */
-    Map<String, Object> handleCompletion(Map<String, Object> completionMessage);
+    Result<Map<String, Object>, Map<String, Object>> handleCompletion(Map<String, Object> completionMessage);
 
     /**
      * Processes a transfer termination message received from the counter-party.
@@ -81,17 +82,17 @@ public interface TransferProcessManager {
     /**
      * Processes a transfer suspension message received from the counter-party.
      */
-    Map<String, Object> handleSuspension(Map<String, Object> suspensionMessage);
+    Result<Map<String, Object>, Map<String, Object>> handleSuspension(Map<String, Object> suspensionMessage);
 
     /**
      * Processes a transfer request received from the counter-party.
      */
-    Map<String, Object> handleStart(Map<String, Object> startMessage, Predicate<TransferProcess.DataAddress> dataAddressPredicate);
+    Result<Map<String, Object>, Map<String, Object>> handleStart(Map<String, Object> startMessage, Predicate<TransferProcess.DataAddress> dataAddressPredicate);
 
     /**
      * Processes a transfer request received from the counter-party.
      */
-    default Map<String, Object> handleStart(Map<String, Object> start) {
+    default Result<Map<String, Object>, Map<String, Object>> handleStart(Map<String, Object> start) {
         return handleStart(start, dataAddress -> true);
     }
 }

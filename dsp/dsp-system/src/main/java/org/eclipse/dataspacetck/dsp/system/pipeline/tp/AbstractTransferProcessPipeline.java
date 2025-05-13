@@ -17,7 +17,9 @@ package org.eclipse.dataspacetck.dsp.system.pipeline.tp;
 import org.eclipse.dataspacetck.core.api.pipeline.AbstractAsyncPipeline;
 import org.eclipse.dataspacetck.core.api.system.CallbackEndpoint;
 import org.eclipse.dataspacetck.core.spi.boot.Monitor;
+import org.eclipse.dataspacetck.dsp.system.api.http.FallibleDspHandler;
 import org.eclipse.dataspacetck.dsp.system.api.pipeline.tp.TransferProcessPipeline;
+import org.eclipse.dataspacetck.dsp.system.api.service.Result;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess;
 import org.eclipse.dataspacetck.dsp.system.client.tp.TransferProcessClient;
 
@@ -80,7 +82,10 @@ public abstract class AbstractTransferProcessPipeline<P extends TransferProcessP
             monitor.debug("Sending transfer completion");
             var consumerAddress = transferProcess.getCallbackAddress();
             transferProcessClient.completeTransfer(correlationId, completion, consumerAddress, expectError);
-            completed(id);
+
+            if (!expectError) {
+                completed(id);
+            }
         });
         return self();
     }
@@ -94,36 +99,41 @@ public abstract class AbstractTransferProcessPipeline<P extends TransferProcessP
             monitor.debug("Sending transfer suspension");
             var consumerAddress = transferProcess.getCallbackAddress();
             transferProcessClient.suspendTransfer(correlationId, suspension, consumerAddress, expectError);
-            suspended(id);
+
+            if (!expectError) {
+                suspended(id);
+            }
         });
         return self();
     }
 
     @Override
-    public P sendStarted(Map<String, Object> dataAddress) {
+    public P sendStarted(Map<String, Object> dataAddress, boolean expectError) {
         stages.add(() -> {
             var id = transferProcess.getId();
             var correlationId = transferProcess.getCorrelationId();
             var startMessage = createStartRequest(transferProcess.providerPid(), transferProcess.consumerPid(), dataAddress);
             monitor.debug("Sending transfer start");
             var consumerAddress = transferProcess.getCallbackAddress();
-            transferProcessClient.startTransfer(correlationId, startMessage, consumerAddress, false);
-            started(id);
+            transferProcessClient.startTransfer(correlationId, startMessage, consumerAddress, expectError);
+            if (!expectError) {
+                started(id);
+            }
         });
         return self();
     }
 
     @Override
-    public P expectStartMessage(Function<Map<String, Object>, Map<String, Object>> action) {
+    public P expectStartMessage(Function<Map<String, Object>, Result<Map<String, Object>, Map<String, Object>>> action) {
         var latch = new CountDownLatch(1);
         expectLatches.add(latch);
         stages.add(() ->
-                endpoint.registerHandler(TRANSFER_START_PATH, msg -> {
-                    var transfer = action.apply((processJsonLd(msg)));
+                endpoint.registerProtocolHandler(TRANSFER_START_PATH, new FallibleDspHandler(msg -> {
+                    var result = action.apply((processJsonLd(msg)));
                     endpoint.deregisterHandler(TRANSFER_START_PATH);
                     latch.countDown();
-                    return serialize(transfer);
-                }));
+                    return result;
+                })));
         return self();
     }
 
@@ -143,31 +153,31 @@ public abstract class AbstractTransferProcessPipeline<P extends TransferProcessP
     }
 
     @Override
-    public P expectCompletionMessage(Function<Map<String, Object>, Map<String, Object>> action) {
+    public P expectCompletionMessage(Function<Map<String, Object>, Result<Map<String, Object>, Map<String, Object>>> action) {
         var latch = new CountDownLatch(1);
         expectLatches.add(latch);
         stages.add(() ->
-                endpoint.registerHandler(TRANSFER_COMPLETION_PATH, offer -> {
-                    var transfer = action.apply((processJsonLd(offer)));
+                endpoint.registerProtocolHandler(TRANSFER_COMPLETION_PATH, new FallibleDspHandler(offer -> {
+                    var result = action.apply((processJsonLd(offer)));
                     endpoint.deregisterHandler(TRANSFER_COMPLETION_PATH);
                     latch.countDown();
-                    return serialize(transfer);
-                }));
+                    return result;
+                })));
 
         return self();
     }
 
     @Override
-    public P expectSuspensionMessage(Function<Map<String, Object>, Map<String, Object>> action) {
+    public P expectSuspensionMessage(Function<Map<String, Object>, Result<Map<String, Object>, Map<String, Object>>> action) {
         var latch = new CountDownLatch(1);
         expectLatches.add(latch);
         stages.add(() ->
-                endpoint.registerHandler(TRANSFER_SUSPENSION_PATH, offer -> {
-                    var transfer = action.apply((processJsonLd(offer)));
+                endpoint.registerProtocolHandler(TRANSFER_SUSPENSION_PATH, new FallibleDspHandler(offer -> {
+                    var result = action.apply((processJsonLd(offer)));
                     endpoint.deregisterHandler(TRANSFER_SUSPENSION_PATH);
                     latch.countDown();
-                    return serialize(transfer);
-                }));
+                    return result;
+                })));
 
         return self();
     }
