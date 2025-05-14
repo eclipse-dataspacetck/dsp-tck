@@ -21,7 +21,7 @@ import org.eclipse.dataspacetck.dsp.system.api.connector.NegotiationListener;
 import org.eclipse.dataspacetck.dsp.system.api.pipeline.ConsumerNegotiationPipeline;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State;
-import org.eclipse.dataspacetck.dsp.system.client.ConsumerNegotiationClient;
+import org.eclipse.dataspacetck.dsp.system.client.cn.ConsumerNegotiationClient;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -45,8 +45,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Default Implementation.
  */
 public class ConsumerNegotiationPipelineImpl extends AbstractNegotiationPipeline<ConsumerNegotiationPipeline> implements ConsumerNegotiationPipeline {
-    private static final String REQUEST_PATH = "/negotiations/request";
+    private static final String REQUEST_INITIAL_PATH = "/negotiations/request";
+    private static final String REQUEST_PATH = "/negotiations/[^/]+/request";
     private static final String NEGOTIATION_EVENT_PATH = "/negotiations/[^/]+/events";
+
     private static final String VERIFICATION_PATH = "/negotiations/[^/]+/agreement/verification";
 
     private final ConsumerNegotiationClient negotiationClient;
@@ -60,7 +62,7 @@ public class ConsumerNegotiationPipelineImpl extends AbstractNegotiationPipeline
                                            String consumerConnectorId,
                                            Monitor monitor,
                                            long waitTime) {
-        super(endpoint, monitor, waitTime);
+        super(negotiationClient, endpoint, monitor, waitTime);
         this.negotiationClient = negotiationClient;
         this.providerConnector = providerConnector;
         this.endpoint = endpoint;
@@ -85,7 +87,7 @@ public class ConsumerNegotiationPipelineImpl extends AbstractNegotiationPipeline
         return this;
     }
 
-    public ConsumerNegotiationPipeline sendOfferMessage() {
+    public ConsumerNegotiationPipeline sendOfferMessage(boolean expectError) {
         stages.add(() -> {
             var providerId = providerNegotiation.getId();
             var consumerId = providerNegotiation.getCorrelationId();
@@ -95,13 +97,16 @@ public class ConsumerNegotiationPipelineImpl extends AbstractNegotiationPipeline
             var offerMessage = createOffer(providerId, consumerId, offerId, TCK_PARTICIPANT_ID, assignee, datasetId, endpoint.getAddress());
             monitor.debug("Sending offer");
             var consumerAddress = providerNegotiation.getCallbackAddress();
-            negotiationClient.contractOffer(consumerId, offerMessage, consumerAddress, false);
-            providerConnector.getProviderNegotiationManager().offered(providerId);
+            negotiationClient.contractOffer(consumerId, offerMessage, consumerAddress, expectError);
+
+            if (!expectError) {
+                providerConnector.getProviderNegotiationManager().offered(providerId);
+            }
         });
         return this;
     }
 
-    public ConsumerNegotiationPipeline sendAgreementMessage() {
+    public ConsumerNegotiationPipeline sendAgreementMessage(boolean expectError) {
         stages.add(() -> {
             var providerId = providerNegotiation.getId();
             var consumerId = providerNegotiation.getCorrelationId();
@@ -117,22 +122,43 @@ public class ConsumerNegotiationPipelineImpl extends AbstractNegotiationPipeline
                     endpoint.getAddress());
             var callbackAddress = providerNegotiation.getCallbackAddress();
             monitor.debug("Sending agreement");
-            negotiationClient.contractAgreement(consumerId, agreement, callbackAddress);
-            providerConnector.getProviderNegotiationManager().agreed(providerId);
+            negotiationClient.contractAgreement(consumerId, agreement, callbackAddress, expectError);
+
+            if (!expectError) {
+                providerConnector.getProviderNegotiationManager().agreed(providerId);
+            }
         });
         return this;
     }
 
-    public ConsumerNegotiationPipeline sendFinalizedEvent() {
+    public ConsumerNegotiationPipeline sendFinalizedEvent(boolean expectError) {
         stages.add(() -> {
             var providerId = providerNegotiation.getId();
             var consumerId = providerNegotiation.getCorrelationId();
             var event = createFinalizedEvent(providerId, consumerId);
             var callbackAddress = providerNegotiation.getCallbackAddress();
             monitor.debug("Sending finalized event");
-            negotiationClient.finalize(consumerId, event, callbackAddress, false);
-            providerConnector.getProviderNegotiationManager().finalized(providerId);
+            negotiationClient.finalize(consumerId, event, callbackAddress, expectError);
+
+            if (!expectError) {
+                providerConnector.getProviderNegotiationManager().finalized(providerId);
+            }
         });
+        return this;
+    }
+
+    @Override
+    public ConsumerNegotiationPipeline expectInitialRequest(BiFunction<Map<String, Object>, String, Map<String, Object>> action) {
+        var latch = new CountDownLatch(1);
+        expectLatches.add(latch);
+        stages.add(() ->
+                endpoint.registerHandler(REQUEST_INITIAL_PATH, event -> {
+                    var expanded = processJsonLd(event);
+                    var negotiation = action.apply(expanded, consumerConnectorId);
+                    endpoint.deregisterHandler(REQUEST_INITIAL_PATH);
+                    latch.countDown();
+                    return serialize(processJsonLd(negotiation));
+                }));
         return this;
     }
 
@@ -186,4 +212,13 @@ public class ConsumerNegotiationPipelineImpl extends AbstractNegotiationPipeline
         return this;
     }
 
+    @Override
+    protected ConsumerNegotiationPipeline self() {
+        return this;
+    }
+
+    @Override
+    protected void terminated(String id) {
+        providerConnector.getProviderNegotiationManager().terminated(id);
+    }
 }

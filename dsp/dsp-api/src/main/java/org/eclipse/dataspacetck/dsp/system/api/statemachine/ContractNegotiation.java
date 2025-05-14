@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -41,36 +42,23 @@ import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegot
  */
 public class ContractNegotiation {
 
-    public enum State {
-        INITIALIZED,
-        REQUESTED,
-        OFFERED,
-        ACCEPTED,
-        AGREED,
-        VERIFIED,
-        FINALIZED,
-        TERMINATED
-    }
-
     private static final Consumer<ContractNegotiation> NULL_WORK = n -> {
     };
-
+    private final List<BiConsumer<State, ContractNegotiation>> listeners = new ArrayList<>();
+    private final List<Map<String, Object>> offers = new ArrayList<>();
+    private final LockManager lockManager = new LockManager();
     private String id;
     private String correlationId;
     private String offerId;
     private String datasetId;
     private String counterPartyId;
     private String callbackAddress;
-
     private State state = State.INITIALIZED;
-
-    private List<BiConsumer<State, ContractNegotiation>> listeners = new ArrayList<>();
-
-    private List<Map<String, Object>> offers = new ArrayList<>();
-
     private Map<String, Object> agreement;
+    private NegotiationKind negotiationKind = NegotiationKind.Consumer;
 
-    private LockManager lockManager = new LockManager();
+    private ContractNegotiation() {
+    }
 
     public String getId() {
         return id;
@@ -102,6 +90,14 @@ public class ContractNegotiation {
 
     public Map<String, Object> getLastOffer() {
         return lockManager.readLock(() -> offers.isEmpty() ? null : offers.get(offers.size() - 1));
+    }
+
+    public String consumerPid() {
+        return negotiationKind.equals(NegotiationKind.Consumer) ? id : correlationId;
+    }
+
+    public String providerPid() {
+        return negotiationKind.equals(NegotiationKind.Provider) ? id : correlationId;
     }
 
     public List<Map<String, Object>> getOffers() {
@@ -219,11 +215,28 @@ public class ContractNegotiation {
         throw new IllegalStateException(format("Illegal state transition from %s to %s. To state must be one of %s.", this.state, toState, legalStates));
     }
 
-    private ContractNegotiation() {
+    public enum State {
+        INITIALIZED,
+        REQUESTED,
+        OFFERED,
+        ACCEPTED,
+        AGREED,
+        VERIFIED,
+        FINALIZED,
+        TERMINATED
+    }
+
+    public enum NegotiationKind {
+        Consumer,
+        Provider
     }
 
     public static class Builder {
         private ContractNegotiation negotiation;
+
+        private Builder() {
+            negotiation = new ContractNegotiation();
+        }
 
         public static Builder newInstance() {
             return new Builder();
@@ -265,14 +278,16 @@ public class ContractNegotiation {
             return this;
         }
 
+        public Builder negotiationKind(NegotiationKind negotiationKind) {
+            this.negotiation.negotiationKind = negotiationKind;
+            return this;
+        }
+
         public ContractNegotiation build() {
             negotiation.id = randomUUID().toString();
             negotiation.verifyCorrelationId(negotiation.state);
+            Objects.requireNonNull(negotiation.negotiationKind);
             return negotiation;
-        }
-
-        private Builder() {
-            negotiation = new ContractNegotiation();
         }
 
     }

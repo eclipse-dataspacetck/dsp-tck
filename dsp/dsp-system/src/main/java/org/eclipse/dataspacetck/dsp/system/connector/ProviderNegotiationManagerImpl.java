@@ -15,6 +15,7 @@
 
 package org.eclipse.dataspacetck.dsp.system.connector;
 
+import org.eclipse.dataspacetck.core.spi.boot.Monitor;
 import org.eclipse.dataspacetck.dsp.system.api.connector.ProviderNegotiationManager;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +35,7 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.ma
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringProperty;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createNegotiationResponse;
+import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.NegotiationKind.Provider;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State.ACCEPTED;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State.AGREED;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State.FINALIZED;
@@ -46,6 +48,17 @@ import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegot
  * Manages contract negotiations on a provider.
  */
 public class ProviderNegotiationManagerImpl extends AbstractNegotiationManager implements ProviderNegotiationManager {
+
+    public ProviderNegotiationManagerImpl(Monitor monitor) {
+        super(monitor);
+    }
+
+    @Override
+    protected NegotiationId parseId(Map<String, Object> message) {
+        var providerPid = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, message);
+        var consumerPid = stringIdProperty(DSPACE_PROPERTY_CONSUMER_PID_EXPANDED, message);
+        return new NegotiationId(providerPid, consumerPid);
+    }
 
     @Override
     public void offered(String providerId) {
@@ -130,6 +143,7 @@ public class ProviderNegotiationManagerImpl extends AbstractNegotiationManager i
                 .state(REQUESTED)
                 .counterPartyId(counterPartyId)
                 .callbackAddress(callbackAddress)
+                .negotiationKind(Provider)
                 .build();
 
         negotiations.put(negotiation.getId(), negotiation);

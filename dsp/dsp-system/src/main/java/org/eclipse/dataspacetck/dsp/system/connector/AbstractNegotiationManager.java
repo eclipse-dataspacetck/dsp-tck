@@ -14,6 +14,7 @@
 
 package org.eclipse.dataspacetck.dsp.system.connector;
 
+import org.eclipse.dataspacetck.core.spi.boot.Monitor;
 import org.eclipse.dataspacetck.dsp.system.api.connector.NegotiationListener;
 import org.eclipse.dataspacetck.dsp.system.api.connector.NegotiationManager;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation;
@@ -25,12 +26,21 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import static java.lang.String.format;
+import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createNegotiationResponse;
+import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State.TERMINATED;
+
 /**
  * Base implementation.
  */
 public abstract class AbstractNegotiationManager implements NegotiationManager {
+    private final Monitor monitor;
     protected Map<String, ContractNegotiation> negotiations = new ConcurrentHashMap<>();
     protected Queue<NegotiationListener> listeners = new ConcurrentLinkedQueue<>();
+
+    protected AbstractNegotiationManager(Monitor monitor) {
+        this.monitor = monitor;
+    }
 
     @NotNull
     @Override
@@ -66,4 +76,23 @@ public abstract class AbstractNegotiationManager implements NegotiationManager {
     }
 
 
+    @Override
+    public Map<String, Object> handleTermination(Map<String, Object> terminatedMessage) {
+        var ids = parseId(terminatedMessage);
+        monitor.debug(format("Received terminated message: %s with correlation id %s", ids.id, ids.correlationId));
+        var negotiation = findById(ids.id);
+        negotiation.transition(TERMINATED, n -> listeners.forEach(l -> l.terminated(negotiation)));
+        return createNegotiationResponse(negotiation.getCorrelationId(), negotiation.getId(), TERMINATED.toString());
+    }
+
+    protected abstract NegotiationId parseId(Map<String, Object> message);
+
+    @Override
+    public void terminated(String id) {
+        var cn = findById(id);
+        cn.transition(TERMINATED, n -> listeners.forEach(l -> l.terminated(n)));
+    }
+
+    protected record NegotiationId(String id, String correlationId) {
+    }
 }

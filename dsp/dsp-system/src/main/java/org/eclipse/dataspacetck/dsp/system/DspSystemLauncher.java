@@ -32,10 +32,12 @@ import org.eclipse.dataspacetck.dsp.system.api.pipeline.ConsumerNegotiationPipel
 import org.eclipse.dataspacetck.dsp.system.api.pipeline.ProviderNegotiationPipeline;
 import org.eclipse.dataspacetck.dsp.system.api.pipeline.tp.ConsumerTransferProcessPipeline;
 import org.eclipse.dataspacetck.dsp.system.api.pipeline.tp.ProviderTransferProcessPipeline;
-import org.eclipse.dataspacetck.dsp.system.client.ConsumerNegotiationClient;
-import org.eclipse.dataspacetck.dsp.system.client.ConsumerNegotiationClientImpl;
-import org.eclipse.dataspacetck.dsp.system.client.ProviderNegotiationClient;
-import org.eclipse.dataspacetck.dsp.system.client.ProviderNegotiationClientImpl;
+import org.eclipse.dataspacetck.dsp.system.client.cn.ConsumerNegotiationClient;
+import org.eclipse.dataspacetck.dsp.system.client.cn.ProviderNegotiationClient;
+import org.eclipse.dataspacetck.dsp.system.client.cn.http.HttpConsumerNegotiationClientImpl;
+import org.eclipse.dataspacetck.dsp.system.client.cn.http.HttpProviderNegotiationClientImpl;
+import org.eclipse.dataspacetck.dsp.system.client.cn.local.LocalConsumerNegotiationClientImpl;
+import org.eclipse.dataspacetck.dsp.system.client.cn.local.LocalProviderNegotiationClientImpl;
 import org.eclipse.dataspacetck.dsp.system.client.tp.ConsumerTransferProcessClient;
 import org.eclipse.dataspacetck.dsp.system.client.tp.ProviderTransferProcessClient;
 import org.eclipse.dataspacetck.dsp.system.client.tp.http.HttpConsumerTransferProcessClient;
@@ -186,6 +188,7 @@ public class DspSystemLauncher implements SystemLauncher {
         var pipeline = new ProviderNegotiationPipelineImpl(negotiationClient,
                 callbackEndpoint,
                 consumerConnector,
+                baseConnectorUrl,
                 connectorUnderTestId,
                 monitor,
                 waitTime);
@@ -242,27 +245,24 @@ public class DspSystemLauncher implements SystemLauncher {
     private ProviderNegotiationClient createNegotiationClient(String scopeId) {
         return negotiationClients.computeIfAbsent(scopeId, k -> {
             if (useLocalConnector) {
-                return new ProviderNegotiationClientImpl(providerConnectors.computeIfAbsent(scopeId, k2 -> new TckConnector(monitor)), monitor);
+                return new LocalProviderNegotiationClientImpl(providerConnectors.computeIfAbsent(scopeId, k2 -> new TckConnector(monitor)));
             }
-            return new ProviderNegotiationClientImpl(baseConnectorUrl, monitor);
+            return new HttpProviderNegotiationClientImpl(baseConnectorUrl, monitor);
         });
     }
 
     private ConsumerNegotiationClient createConsumerNegotiationClient(String scopeId,
                                                                       ServiceConfiguration configuration,
                                                                       ServiceResolver resolver) {
-        var providerConnector = providerConnectors.computeIfAbsent(scopeId, k -> new TckConnector(monitor));
         return consumerNegotiationClients.computeIfAbsent(scopeId, k -> {
             if (useLocalConnector) {
                 var consumerConnector = consumerConnectors.computeIfAbsent(scopeId, k2 -> new TckConnector(monitor));
-                var callbackEndpoint = (CallbackEndpoint) resolver.resolve(CallbackEndpoint.class, configuration);
-                return new ConsumerNegotiationClientImpl(consumerConnector, providerConnector, monitor);
+                return new LocalConsumerNegotiationClientImpl(consumerConnector);
             }
             var callbackEndpoint = (CallbackEndpoint) resolver.resolve(CallbackEndpoint.class, configuration);
             assert callbackEndpoint != null;
-            return new ConsumerNegotiationClientImpl(
+            return new HttpConsumerNegotiationClientImpl(
                     connectorInitiateUrl,
-                    providerConnector,
                     callbackEndpoint.getAddress(),
                     monitor);
         });

@@ -27,7 +27,7 @@ import static org.eclipse.dataspacetck.dsp.verification.cn.ProviderActions.postO
 import static org.eclipse.dataspacetck.dsp.verification.cn.ProviderActions.postTerminate;
 
 @Tag("base-compliance")
-@DisplayName("CN_02: Provider test scenarios")
+@DisplayName("CN_02: Contract request provider scenarios")
 public class ContractNegotiationProvider02Test extends AbstractContractNegotiationProviderTest {
 
     @MandatoryTest

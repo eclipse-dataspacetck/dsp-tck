@@ -51,5 +51,14 @@ public interface NegotiationManager {
      * Removes a listener.
      */
     void deregisterListener(NegotiationListener listener);
+    
+    /**
+     * Processes a negotiation termination message received from the counter-party.
+     */
+    Map<String, Object> handleTermination(Map<String, Object> terminatedMessage);
 
+    /**
+     * Transitions the negotiation to {@link ContractNegotiation.State#TERMINATED}.
+     */
+    void terminated(String consumerId);
 }

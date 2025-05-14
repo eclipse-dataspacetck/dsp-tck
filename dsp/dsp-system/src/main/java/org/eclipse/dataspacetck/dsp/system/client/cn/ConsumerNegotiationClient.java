@@ -12,14 +12,14 @@
  *
  */
 
-package org.eclipse.dataspacetck.dsp.system.client;
+package org.eclipse.dataspacetck.dsp.system.client.cn;
 
 import java.util.Map;
 
 /**
  * Proxy to the consumer connector being verified for contract negotiation.
  */
-public interface ConsumerNegotiationClient {
+public interface ConsumerNegotiationClient extends NegotiationClient {
 
     /**
      * Signals to the consumer connector to initiate a contract request.
@@ -34,7 +34,7 @@ public interface ConsumerNegotiationClient {
     /**
      * Sends an agreement to the consumer connector.
      */
-    void contractAgreement(String consumerId, Map<String, Object> agreement, String callbackAddress);
+    void contractAgreement(String consumerId, Map<String, Object> agreement, String callbackAddress, boolean expectError);
 
     /**
      * Sends the finalized event to the consumer connector.

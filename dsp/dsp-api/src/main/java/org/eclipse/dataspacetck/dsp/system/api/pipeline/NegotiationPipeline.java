@@ -17,6 +17,9 @@ package org.eclipse.dataspacetck.dsp.system.api.pipeline;
 import org.eclipse.dataspacetck.core.api.pipeline.AsyncPipeline;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State;
 
+import java.util.Map;
+import java.util.function.Function;
+
 /**
  * Constructs a contract negotiation with a connector under test.
  */
@@ -27,4 +30,24 @@ public interface NegotiationPipeline<P extends NegotiationPipeline<P>> extends A
      */
     P thenWaitForState(State state);
 
+
+    /**
+     * Sends a termination message to the connector under test.
+     */
+    default P sendTermination() {
+        return sendTermination(false);
+    }
+
+    /**
+     * Sends a termination message to the connector under test.
+     */
+    P sendTermination(boolean expectError);
+
+    /**
+     * Expects a transfer termination message and executes the given action.
+     *
+     * @param action the action to execute
+     * @return this pipeline instance
+     */
+    P expectTerminationMessage(Function<Map<String, Object>, Map<String, Object>> action);
 }

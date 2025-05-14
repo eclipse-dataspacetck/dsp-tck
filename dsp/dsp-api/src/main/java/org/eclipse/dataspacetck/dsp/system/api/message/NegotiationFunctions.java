@@ -94,9 +94,17 @@ public class NegotiationFunctions {
     }
 
     public static Map<String, Object> createContractRequest(String consumerPid, String offerId, String targetId, String callbackAddress) {
+        return createContractRequest(consumerPid, null, offerId, targetId, callbackAddress);
+    }
+
+    public static Map<String, Object> createContractRequest(String consumerPid, String providerPid, String offerId, String targetId, String callbackAddress) {
         var message = createBaseMessage("ContractRequestMessage");
         message.put(CONTEXT, createDspContext());
         message.put(DSPACE_PROPERTY_CONSUMER_PID, consumerPid);
+
+        if (providerPid != null) {
+            message.put(DSPACE_PROPERTY_PROVIDER_PID, providerPid);
+        }
 
         @DspTestingWorkaround("Remove @type")
         var offer = new LinkedHashMap<String, Object>();

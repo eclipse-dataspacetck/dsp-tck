@@ -25,6 +25,7 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPAC
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_PROVIDER_PID_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createNegotiationResponse;
+import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.NegotiationKind.Consumer;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State.ACCEPTED;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State.OFFERED;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State.REQUESTED;
@@ -38,15 +39,21 @@ public class ConsumerNegotiationManagerImpl extends AbstractNegotiationManager i
     private final Monitor monitor;
 
     public ConsumerNegotiationManagerImpl(Monitor monitor) {
+        super(monitor);
         this.monitor = monitor;
     }
 
     @Override
-    public ContractNegotiation createNegotiation(String datasetId, String offerId) {
-        var negotiation = ContractNegotiation.Builder.newInstance()
+    public ContractNegotiation createNegotiation(String datasetId, String offerId, String callbackAddress) {
+        var negotiationBuilder = ContractNegotiation.Builder.newInstance()
                 .datasetId(datasetId)
                 .offerId(offerId)
-                .build();
+                .negotiationKind(Consumer);
+
+        if (callbackAddress != null) {
+            negotiationBuilder.callbackAddress(callbackAddress);
+        }
+        var negotiation = negotiationBuilder.build();
         negotiations.put(negotiation.getId(), negotiation);
         listeners.forEach(l -> l.contractInitialized(negotiation));
         return negotiation;
@@ -111,4 +118,10 @@ public class ConsumerNegotiationManagerImpl extends AbstractNegotiationManager i
         negotiation.transition(ContractNegotiation.State.FINALIZED, n -> listeners.forEach(l -> l.finalized(negotiation)));
     }
 
+    @Override
+    protected NegotiationId parseId(Map<String, Object> message) {
+        var providerPid = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, message);
+        var consumerPid = stringIdProperty(DSPACE_PROPERTY_CONSUMER_PID_EXPANDED, message);
+        return new NegotiationId(consumerPid, providerPid);
+    }
 }

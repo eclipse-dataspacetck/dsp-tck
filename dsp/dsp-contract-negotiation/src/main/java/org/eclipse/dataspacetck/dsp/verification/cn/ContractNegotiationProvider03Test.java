@@ -25,7 +25,7 @@ import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegot
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State.OFFERED;
 
 @Tag("base-compliance")
-@DisplayName("CN_03: Provider negative test scenarios")
+@DisplayName("CN_03: Contract request provider negative test scenarios")
 public class ContractNegotiationProvider03Test extends AbstractContractNegotiationProviderTest {
 
     @MandatoryTest

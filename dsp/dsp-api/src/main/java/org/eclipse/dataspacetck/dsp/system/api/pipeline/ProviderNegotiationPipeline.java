@@ -33,11 +33,7 @@ public interface ProviderNegotiationPipeline extends NegotiationPipeline<Provide
     ProviderNegotiationPipeline sendCounterOfferMessage(String offerId, String targetId);
 
     ProviderNegotiationPipeline sendCounterOfferMessage(String offerId, String targetId, boolean expectError);
-
-    ProviderNegotiationPipeline sendTermination();
-
-    ProviderNegotiationPipeline sendTermination(boolean expectError);
-
+    
     ProviderNegotiationPipeline acceptLastOffer();
 
     ProviderNegotiationPipeline sendVerifiedEvent();

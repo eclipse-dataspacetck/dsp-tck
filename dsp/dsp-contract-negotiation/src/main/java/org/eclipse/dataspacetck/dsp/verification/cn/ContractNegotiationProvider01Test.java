@@ -26,7 +26,7 @@ import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegot
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State.TERMINATED;
 
 @Tag("base-compliance")
-@DisplayName("CN_01: Contract request scenarios")
+@DisplayName("CN_01: Contract request provider scenarios")
 public class ContractNegotiationProvider01Test extends AbstractContractNegotiationProviderTest {
 
     @MandatoryTest
@@ -41,8 +41,8 @@ public class ContractNegotiationProvider01Test extends AbstractContractNegotiati
             CUT->>TCK: ContractOfferMessage
             TCK-->>CUT: 200 OK
             
-            CUT->>TCK: ContractNegotiationTerminationMessage
-            TCK-->>CUT: 200 OK
+            TCK->>CUT: ContractNegotiationTerminationMessage
+            CUT-->>TCK: 200 OK
             """)
     public void cn_01_01() {
 
@@ -86,7 +86,7 @@ public class ContractNegotiationProvider01Test extends AbstractContractNegotiati
                 .expectOfferMessage(offer -> consumerConnector.getConsumerNegotiationManager().handleOffer(offer))
                 .sendRequestMessage(datasetId, offerId)
                 .thenWaitForState(OFFERED)
-                .expectTermination()
+                .expectTerminationMessage(msg -> consumerConnector.getConsumerNegotiationManager().handleTermination(msg))
                 .sendCounterOfferMessage("CD123:ACN0102:456", "ACN0102")
                 .thenWaitForState(TERMINATED)
                 .execute();
@@ -157,8 +157,6 @@ public class ContractNegotiationProvider01Test extends AbstractContractNegotiati
             CUT-->>TCK: 200 OK
             
             CUT->>TCK: ContractNegotiationEventMessage:finalized
-            
-            CUT->>TCK: ContractNegotiationTerminationMessage
             TCK-->>CUT: 200 OK
             """)
     public void cn_01_04() {

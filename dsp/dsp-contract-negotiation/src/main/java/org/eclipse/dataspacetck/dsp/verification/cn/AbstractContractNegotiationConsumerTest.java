@@ -15,12 +15,15 @@
 
 package org.eclipse.dataspacetck.dsp.verification.cn;
 
+import org.eclipse.dataspacetck.core.api.system.ConfigParam;
 import org.eclipse.dataspacetck.core.api.system.Inject;
 import org.eclipse.dataspacetck.dsp.system.api.connector.Connector;
 import org.eclipse.dataspacetck.dsp.system.api.connector.Provider;
 import org.eclipse.dataspacetck.dsp.system.api.mock.ConsumerNegotiationMock;
 import org.eclipse.dataspacetck.dsp.system.api.pipeline.ConsumerNegotiationPipeline;
 import org.junit.jupiter.api.Tag;
+
+import static java.util.UUID.randomUUID;
 
 /**
  * Base class for verifying a connector in the consumer role.
@@ -38,4 +41,6 @@ public abstract class AbstractContractNegotiationConsumerTest extends AbstractCo
     @Inject
     protected ConsumerNegotiationMock negotiationMock;
 
+    @ConfigParam
+    protected String datasetId = randomUUID().toString();
 }

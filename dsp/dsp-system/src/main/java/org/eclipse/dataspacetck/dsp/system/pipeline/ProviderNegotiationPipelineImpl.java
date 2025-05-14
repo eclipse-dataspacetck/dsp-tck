@@ -21,7 +21,7 @@ import org.eclipse.dataspacetck.dsp.system.api.connector.Connector;
 import org.eclipse.dataspacetck.dsp.system.api.pipeline.ProviderNegotiationPipeline;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State;
-import org.eclipse.dataspacetck.dsp.system.client.ProviderNegotiationClient;
+import org.eclipse.dataspacetck.dsp.system.client.cn.ProviderNegotiationClient;
 
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -38,7 +38,6 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.st
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createAcceptedEvent;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createContractRequest;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createCounterOffer;
-import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createTermination;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createVerification;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State.TERMINATED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,18 +52,21 @@ public class ProviderNegotiationPipelineImpl extends AbstractNegotiationPipeline
     private static final String NEGOTIATION_EVENT_PATH = "/negotiations/[^/]+/events";
 
     private final Connector consumerConnector;
+    private final String providerBaseUrl;
     private final String providerConnectorId;
     private final ProviderNegotiationClient negotiationClient;
 
     public ProviderNegotiationPipelineImpl(ProviderNegotiationClient negotiationClient,
                                            CallbackEndpoint endpoint,
                                            Connector connector,
+                                           String providerBaseUrl,
                                            String providerConnectorId,
                                            Monitor monitor,
                                            long waitTime) {
-        super(endpoint, monitor, waitTime);
+        super(negotiationClient, endpoint, monitor, waitTime);
         this.negotiationClient = negotiationClient;
         this.consumerConnector = connector;
+        this.providerBaseUrl = providerBaseUrl;
         this.providerConnectorId = providerConnectorId;
         this.monitor = monitor;
     }
@@ -72,7 +74,7 @@ public class ProviderNegotiationPipelineImpl extends AbstractNegotiationPipeline
     @SuppressWarnings("unused")
     public ProviderNegotiationPipeline sendRequestMessage(String datasetId, String offerId) {
         stages.add(() -> {
-            providerNegotiation = consumerConnector.getConsumerNegotiationManager().createNegotiation(datasetId, offerId);
+            providerNegotiation = consumerConnector.getConsumerNegotiationManager().createNegotiation(datasetId, offerId, providerBaseUrl);
 
             var contractRequest = createContractRequest(providerNegotiation.getId(), offerId, datasetId, endpoint.getAddress());
 
@@ -110,24 +112,9 @@ public class ProviderNegotiationPipelineImpl extends AbstractNegotiationPipeline
         return this;
     }
 
-    public ProviderNegotiationPipeline sendTermination() {
-        return sendTermination(false);
-    }
-
-    public ProviderNegotiationPipeline sendTermination(boolean expectError) {
-        stages.add(() -> {
-            pause();
-            var providerId = providerNegotiation.getCorrelationId();
-            var consumerId = providerNegotiation.getId();
-            var termination = createTermination(providerId, consumerId, "1");
-
-            monitor.debug("Sending termination: " + providerId);
-            negotiationClient.terminate(termination, expectError);
-            if (!expectError) {
-                consumerConnector.getConsumerNegotiationManager().terminated(consumerId);
-            }
-        });
-        return this;
+    @Override
+    protected void terminated(String id) {
+        consumerConnector.getConsumerNegotiationManager().terminated(id);
     }
 
     public ProviderNegotiationPipeline acceptLastOffer() {
@@ -204,6 +191,9 @@ public class ProviderNegotiationPipelineImpl extends AbstractNegotiationPipeline
         });
         return this;
     }
-
-
+    
+    @Override
+    protected ProviderNegotiationPipeline self() {
+        return this;
+    }
 }

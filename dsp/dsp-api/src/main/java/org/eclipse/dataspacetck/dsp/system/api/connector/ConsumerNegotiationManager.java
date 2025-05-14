@@ -27,7 +27,7 @@ public interface ConsumerNegotiationManager extends NegotiationManager {
     /**
      * Creates a contract negotiation for the given dataset.
      */
-    ContractNegotiation createNegotiation(String datasetId, String offerId);
+    ContractNegotiation createNegotiation(String datasetId, String offerId, String callbackAddress);
 
     /**
      * Called after a contract has been requested and the negotiation id is returned by the provider. The provider negotiation
@@ -50,10 +50,6 @@ public interface ConsumerNegotiationManager extends NegotiationManager {
      */
     void verified(String consumerId);
 
-    /**
-     * Transitions the negotiation to {@link ContractNegotiation.State#TERMINATED}.
-     */
-    void terminated(String consumerId);
 
     /**
      * Processes an offer received from the provider.

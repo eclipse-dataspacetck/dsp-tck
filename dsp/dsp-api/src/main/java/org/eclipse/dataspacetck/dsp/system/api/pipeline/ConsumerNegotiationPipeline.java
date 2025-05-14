@@ -35,17 +35,43 @@ public interface ConsumerNegotiationPipeline extends NegotiationPipeline<Consume
     /**
      * Sends an offer to the consumer connector being verified.
      */
-    ConsumerNegotiationPipeline sendOfferMessage();
+    default ConsumerNegotiationPipeline sendOfferMessage() {
+        return sendOfferMessage(false);
+    }
+
+    /**
+     * Sends an offer to the consumer connector being verified.
+     */
+    ConsumerNegotiationPipeline sendOfferMessage(boolean expectError);
 
     /**
      * Sends an agreement to the consumer connector being verified.
      */
-    ConsumerNegotiationPipeline sendAgreementMessage();
+    default ConsumerNegotiationPipeline sendAgreementMessage() {
+        return sendAgreementMessage(false);
+    }
+
+    /**
+     * Sends an agreement to the consumer connector being verified.
+     */
+    ConsumerNegotiationPipeline sendAgreementMessage(boolean expectError);
 
     /**
      * Sends a finalized event to the consumer connector being verified.
      */
-    ConsumerNegotiationPipeline sendFinalizedEvent();
+    default ConsumerNegotiationPipeline sendFinalizedEvent() {
+        return sendFinalizedEvent(false);
+    }
+
+    /**
+     * Sends a finalized event to the consumer connector being verified.
+     */
+    ConsumerNegotiationPipeline sendFinalizedEvent(boolean expectError);
+
+    /**
+     * Expect an init request and execute the given action.
+     */
+    ConsumerNegotiationPipeline expectInitialRequest(BiFunction<Map<String, Object>, String, Map<String, Object>> action);
 
     /**
      * Expect a request and execute the given action.

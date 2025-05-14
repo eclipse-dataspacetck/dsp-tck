@@ -35,7 +35,7 @@ public class TckConnector implements Connector {
 
     public TckConnector(Monitor monitor) {
         consumerNegotiationManager = new ConsumerNegotiationManagerImpl(monitor);
-        providerNegotiationManager = new ProviderNegotiationManagerImpl();
+        providerNegotiationManager = new ProviderNegotiationManagerImpl(monitor);
         consumerTransferProcessManager = new ConsumerTransferProcessManagerImpl(monitor);
         providerTransferProcessManager = new ProviderTransferProcessManagerImpl(monitor);
     }
