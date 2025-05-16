@@ -79,7 +79,7 @@ public class ContractNegotiationConsumer01Test extends AbstractContractNegotiati
     }
 
     @MandatoryTest
-    @DisplayName("CN:01-02: Verify contract request, offer received, consumer counter-offer, provider terminated")
+    @DisplayName("CN_C:01-02: Verify contract request, offer received, consumer counter-offer, provider terminated")
     @TestSequenceDiagram("""
             participant TCK as Technology Compatibility Kit (provider)
             participant CUT as Connector Under Test (consumer)
@@ -138,7 +138,7 @@ public class ContractNegotiationConsumer01Test extends AbstractContractNegotiati
 
         negotiationMock.recordInitializedAction(ConsumerActions::postRequest);
         negotiationMock.recordOfferedAction(ConsumerActions::postTerminated);
-        
+
         negotiationPipeline
                 .expectInitialRequest((request, counterpartyId) -> providerConnector.getProviderNegotiationManager().handleContractRequest(request, counterpartyId))
                 .initiateRequest(datasetId, offerIdFromDatasetId(datasetId))
