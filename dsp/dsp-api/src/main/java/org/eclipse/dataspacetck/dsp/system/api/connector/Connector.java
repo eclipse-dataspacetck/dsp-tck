@@ -14,6 +14,7 @@
 
 package org.eclipse.dataspacetck.dsp.system.api.connector;
 
+import org.eclipse.dataspacetck.dsp.system.api.connector.catalog.CatalogManager;
 import org.eclipse.dataspacetck.dsp.system.api.connector.tp.ConsumerTransferProcessManager;
 import org.eclipse.dataspacetck.dsp.system.api.connector.tp.ProviderTransferProcessManager;
 
@@ -41,4 +42,9 @@ public interface Connector {
      * Returns the manager for consumer-side transfer processes.
      */
     ConsumerTransferProcessManager getConsumerTransferProcessManager();
+
+    /**
+     * Returns the manager for catalog operations.
+     */
+    CatalogManager getCatalogManager();
 }

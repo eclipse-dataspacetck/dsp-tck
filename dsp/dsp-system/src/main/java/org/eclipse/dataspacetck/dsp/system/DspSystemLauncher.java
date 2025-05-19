@@ -21,6 +21,7 @@ import org.eclipse.dataspacetck.core.spi.system.ServiceConfiguration;
 import org.eclipse.dataspacetck.core.spi.system.ServiceResolver;
 import org.eclipse.dataspacetck.core.spi.system.SystemConfiguration;
 import org.eclipse.dataspacetck.core.spi.system.SystemLauncher;
+import org.eclipse.dataspacetck.dsp.system.api.client.catalog.CatalogClient;
 import org.eclipse.dataspacetck.dsp.system.api.connector.Connector;
 import org.eclipse.dataspacetck.dsp.system.api.connector.Consumer;
 import org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions;
@@ -32,6 +33,8 @@ import org.eclipse.dataspacetck.dsp.system.api.pipeline.ConsumerNegotiationPipel
 import org.eclipse.dataspacetck.dsp.system.api.pipeline.ProviderNegotiationPipeline;
 import org.eclipse.dataspacetck.dsp.system.api.pipeline.tp.ConsumerTransferProcessPipeline;
 import org.eclipse.dataspacetck.dsp.system.api.pipeline.tp.ProviderTransferProcessPipeline;
+import org.eclipse.dataspacetck.dsp.system.client.catalog.http.HttpCatalogClient;
+import org.eclipse.dataspacetck.dsp.system.client.catalog.local.LocalCatalogClient;
 import org.eclipse.dataspacetck.dsp.system.client.cn.ConsumerNegotiationClient;
 import org.eclipse.dataspacetck.dsp.system.client.cn.ProviderNegotiationClient;
 import org.eclipse.dataspacetck.dsp.system.client.cn.http.HttpConsumerNegotiationClientImpl;
@@ -90,6 +93,8 @@ public class DspSystemLauncher implements SystemLauncher {
     private final Map<String, ProviderTransferProcessMock> providerTransferMocks = new ConcurrentHashMap<>();
     private final Map<String, ConsumerNegotiationMock> consumerNegotiationMocks = new ConcurrentHashMap<>();
     private final Map<String, ConsumerNegotiationClient> consumerNegotiationClients = new ConcurrentHashMap<>();
+    private final Map<String, CatalogClient> providerCatalogClients = new ConcurrentHashMap<>();
+
     private Monitor monitor;
     private ExecutorService executor;
     private String connectorUnderTestId = "ANONYMOUS";
@@ -176,6 +181,8 @@ public class DspSystemLauncher implements SystemLauncher {
             return type.cast(createConsumerTransferProcessMock(type, configuration.getScopeId(), configuration, resolver));
         } else if (ProviderTransferProcessMock.class.equals(type)) {
             return type.cast(createProviderTransferProcessMock(type, configuration.getScopeId(), configuration, resolver));
+        } else if (CatalogClient.class.equals(type)) {
+            return type.cast(createCatalogClient(configuration.getScopeId(), configuration, resolver));
         }
         return null;
     }
@@ -350,5 +357,14 @@ public class DspSystemLauncher implements SystemLauncher {
                 return new NoOpProviderTransferProcessMock();
             }
         }));
+    }
+
+    private CatalogClient createCatalogClient(String scopeId, ServiceConfiguration configuration, ServiceResolver resolver) {
+        return providerCatalogClients.computeIfAbsent(scopeId, k -> {
+            if (useLocalConnector) {
+                return new LocalCatalogClient(providerConnectors.computeIfAbsent(scopeId, k2 -> new TckConnector(monitor)));
+            }
+            return new HttpCatalogClient(baseConnectorUrl, monitor);
+        });
     }
 }

@@ -80,6 +80,10 @@ public class HttpFunctions {
     }
 
     public static Response getJson(String url) {
+        return getJson(url, false);
+    }
+
+    public static Response getJson(String url, boolean expectError) {
         var httpRequest = new Request.Builder()
                 .url(url)
                 .get()
@@ -88,9 +92,9 @@ public class HttpFunctions {
         var httpClient = new OkHttpClient.Builder().addInterceptor(authorizationInterceptor).build();
         try {
             var response = httpClient.newCall(httpRequest).execute();
-            if (404 == response.code()) {
+            if (404 == response.code() && !expectError) {
                 throw new AssertionError("Unexpected 404 received for request: " + url);
-            } else if (!response.isSuccessful()) {
+            } else if (!response.isSuccessful() && !expectError) {
                 throw new AssertionError("Unexpected response code: " + response.code());
             }
             return response;

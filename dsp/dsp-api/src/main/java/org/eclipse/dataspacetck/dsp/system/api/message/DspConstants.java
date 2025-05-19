@@ -70,4 +70,8 @@ public interface DspConstants {
     String DSPACE_PROPERTY_ENDPOINT_PROPERTY_VALUE_EXPANDED = DSPACE_NAMESPACE + DSPACE_PROPERTY_VALUE;
 
 
+    // Catalog
+    String DSPACE_PROPERTY_PARTICIPANT_ID = "participantId";
+    String DSPACE_CATALOG_ERROR = DSPACE_NAMESPACE + "CatalogError";
+
 }
