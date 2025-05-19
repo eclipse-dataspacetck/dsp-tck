@@ -107,7 +107,7 @@ public class ProviderNegotiationPipelineImpl extends AbstractNegotiationPipeline
             if (!expectError) {
                 consumerConnector.getConsumerNegotiationManager().counterOffered(consumerId);
             }
-            negotiationClient.contractRequest(contractRequest, providerConnectorId, expectError);
+            negotiationClient.contractOfferRequest(contractRequest, providerConnectorId, expectError);
         });
         return this;
     }
@@ -191,7 +191,7 @@ public class ProviderNegotiationPipelineImpl extends AbstractNegotiationPipeline
         });
         return this;
     }
-    
+
     @Override
     protected ProviderNegotiationPipeline self() {
         return this;

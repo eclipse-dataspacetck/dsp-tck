@@ -41,6 +41,11 @@ public class LocalProviderNegotiationClientImpl extends AbstractLocalNegotiation
     }
 
     @Override
+    public void contractOfferRequest(Map<String, Object> message, String counterPartyId, boolean expectError) {
+        contractRequest(message, counterPartyId, expectError);
+    }
+
+    @Override
     public void accept(Map<String, Object> event) {
         var compacted = processJsonLd(event);
         systemConnector.getProviderNegotiationManager().handleAccepted(compacted);

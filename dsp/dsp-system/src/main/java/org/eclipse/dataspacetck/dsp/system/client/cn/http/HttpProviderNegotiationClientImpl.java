@@ -37,9 +37,10 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.st
 public class HttpProviderNegotiationClientImpl extends AbstractHttpNegotiationClient implements ProviderNegotiationClient {
     private static final String GET_PATH = "negotiations/%s";
     private static final String REQUEST_PATH = "negotiations/request";
-    private static final String TERMINATE_PATH = "negotiations/%s/termination";
     private static final String EVENT_PATH = "negotiations/%s/events";
     private static final String VERIFICATION_PATH = "negotiations/%s/agreement/verification";
+    private static final String REQUEST_OFFER_PATH = "negotiations/%s/request";
+
     private final Monitor monitor;
     private final String providerConnectorBaseUrl;
     private Connector systemConnector;
@@ -56,6 +57,14 @@ public class HttpProviderNegotiationClientImpl extends AbstractHttpNegotiationCl
             monitor.debug("Received contract request response");
             //noinspection DataFlowIssue
             return processJsonLd(response.body().byteStream());
+        }
+    }
+
+    @Override
+    public void contractOfferRequest(Map<String, Object> contractRequest, String counterPartyId, boolean expectError) {
+        var providerId = compactStringProperty(DSPACE_PROPERTY_PROVIDER_PID, contractRequest);
+        try (var response = postJson(providerConnectorBaseUrl + format(REQUEST_OFFER_PATH, providerId), contractRequest, expectError)) {
+            monitor.debug("Received contract offer request response");
         }
     }
 

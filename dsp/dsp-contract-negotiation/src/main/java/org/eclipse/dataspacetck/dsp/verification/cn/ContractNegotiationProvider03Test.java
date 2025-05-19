@@ -160,8 +160,8 @@ public class ContractNegotiationProvider03Test extends AbstractContractNegotiati
                 .expectOfferMessage(offer -> consumerConnector.getConsumerNegotiationManager().handleOffer(offer))
                 .sendRequestMessage(datasetId, offerId)
                 .thenWaitForState(OFFERED)
-                .sendCounterOfferMessage("CD123:ACN0304:456", "ACN0304")
-                .sendCounterOfferMessage("CD123:ACN0304:456", "ACN0304", true) // send second offer
+                .sendCounterOfferMessage(offerId, datasetId)
+                .sendCounterOfferMessage(offerId, datasetId, true) // send second offer
                 .execute();
 
         negotiationMock.verify();

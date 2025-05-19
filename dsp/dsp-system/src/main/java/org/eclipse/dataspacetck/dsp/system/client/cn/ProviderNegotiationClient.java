@@ -22,9 +22,14 @@ import java.util.Map;
 public interface ProviderNegotiationClient extends NegotiationClient {
 
     /**
-     * Sends the contract request to the provider. Used for initial requests and client counter-offers.
+     * Sends the contract request to the provider. Used for initial requests.
      */
     Map<String, Object> contractRequest(Map<String, Object> message, String counterPartyId, boolean expectError);
+
+    /**
+     * Sends a subsequent contract request to the provider. Used client counter-offers.
+     */
+    void contractOfferRequest(Map<String, Object> message, String counterPartyId, boolean expectError);
 
     /**
      * Sends the accepted event to the provider connector.
