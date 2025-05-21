@@ -80,7 +80,7 @@ public class HttpConsumerNegotiationClientImpl extends AbstractHttpNegotiationCl
 
     @Override
     public void finalize(String consumerId, Map<String, Object> event, String callbackAddress, boolean expectError) {
-        try (var response = postJson(format(FINALIZE_PATH, callbackAddress, consumerId), event, false)) {
+        try (var response = postJson(format(FINALIZE_PATH, callbackAddress, consumerId), event, expectError)) {
             monitor.debug("Received contract finalize response");
             // TODO Validate response
             // processJsonLd(response.body().byteStream(), createDspContext());
