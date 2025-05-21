@@ -142,12 +142,6 @@ public class ContractNegotiationConsumer03Test extends AbstractContractNegotiati
             CUT->>TCK: ContractNegotiationEventMessage:accepted
             TCK-->>CUT: 200 OK
             
-            TCK->>CUT: ContractAgreementMessage
-            CUT-->>TCK: 200 OK
-            
-            CUT->>TCK: ContractAgreementVerificationMessage
-            TCK-->>CUT: 200 OK
-            
             TCK->>CUT: ContractNegotiationEventMessage:finalized
             CUT-->>TCK: 4xx ERROR
             """)
