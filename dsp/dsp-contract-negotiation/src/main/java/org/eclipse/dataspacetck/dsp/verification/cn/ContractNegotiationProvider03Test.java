@@ -62,6 +62,7 @@ public class ContractNegotiationProvider03Test extends AbstractContractNegotiati
                 .expectFinalizedEvent(event -> consumerConnector.getConsumerNegotiationManager().handleFinalized(event))
                 .sendVerifiedEvent()
                 .thenWaitForState(FINALIZED)
+                .thenVerifyProviderState(FINALIZED)
                 .sendTermination(true)
                 .execute();
 

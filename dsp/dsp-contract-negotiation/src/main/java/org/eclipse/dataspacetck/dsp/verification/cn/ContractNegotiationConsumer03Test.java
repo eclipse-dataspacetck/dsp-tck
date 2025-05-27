@@ -222,7 +222,7 @@ public class ContractNegotiationConsumer03Test extends AbstractContractNegotiati
             CUT-->>TCK: 200 OK
             
             TCK->>CUT: ContractNegotiationEventMessage:finalized
-            CUT-->>TCK: 200 OK
+            CUT-->>TCK: 4xx ERROR
             """)
     public void cn_c_03_06() {
         negotiationMock.recordInitializedAction(ConsumerActions::postRequest);
