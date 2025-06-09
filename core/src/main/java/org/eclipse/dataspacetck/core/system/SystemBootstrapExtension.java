@@ -55,7 +55,7 @@ public class SystemBootstrapExtension implements BeforeAllCallback,
         BeforeEachCallback,
         BeforeTestExecutionCallback,
         ParameterResolver,
-        ExtensionContext.Store.CloseableResource {
+        AutoCloseable {
 
     private static final ExtensionContext.Namespace CALLBACK_NAMESPACE = org.junit.jupiter.api.extension.ExtensionContext.Namespace.create(new Object());
 

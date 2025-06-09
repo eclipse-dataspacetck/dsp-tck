@@ -39,7 +39,7 @@ import static java.util.regex.Pattern.compile;
  * <p>
  * Deserialized messages from incoming transports such as HTTP are dispatched to a registered handler through this endpoint by calling {@link #apply(String, InputStream)}.
  */
-public class DefaultCallbackEndpoint implements CallbackEndpoint, BiFunction<String, InputStream, String>, ExtensionContext.Store.CloseableResource {
+public class DefaultCallbackEndpoint implements CallbackEndpoint, BiFunction<String, InputStream, String>, AutoCloseable {
 
     private final List<LifecycleListener> listeners = new ArrayList<>();
     private final Map<String, ProtocolHandler> handlers = new HashMap<>();
