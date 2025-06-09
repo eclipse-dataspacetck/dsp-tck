@@ -49,6 +49,7 @@ maven/mavencentral/org.junit.platform/junit-platform-engine/1.13.1, EPL-2.0, app
 maven/mavencentral/org.junit.platform/junit-platform-launcher/1.13.1, EPL-2.0, approved, #21708
 maven/mavencentral/org.junit.platform/junit-platform-suite-api/1.13.1, EPL-2.0, approved, #21709
 maven/mavencentral/org.junit.platform/junit-platform-suite-commons/1.13.1, EPL-2.0, approved, #21704
+maven/mavencentral/org.junit.platform/junit-platform-suite-engine/1.13.0, EPL-2.0, approved, #21703
 maven/mavencentral/org.junit.platform/junit-platform-suite-engine/1.13.1, EPL-2.0, approved, #21703
 maven/mavencentral/org.junit/junit-bom/5.13.1, EPL-2.0, approved, #21846
 maven/mavencentral/org.mockito/mockito-core/5.18.0, MIT AND (Apache-2.0 AND MIT) AND Apache-2.0, approved, #21306
