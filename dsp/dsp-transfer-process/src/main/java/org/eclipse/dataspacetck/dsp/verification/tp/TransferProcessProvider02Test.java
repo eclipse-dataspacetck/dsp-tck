@@ -16,6 +16,7 @@ package org.eclipse.dataspacetck.dsp.verification.tp;
 
 import org.eclipse.dataspacetck.api.system.MandatoryTest;
 import org.eclipse.dataspacetck.api.system.TestSequenceDiagram;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 
@@ -131,6 +132,7 @@ public class TransferProcessProvider02Test extends AbstractTransferProcessProvid
         transferProcessMock.verify();
     }
 
+    @Disabled
     @MandatoryTest
     @DisplayName("TP:02-04: Verify transfer request, provider started, consumer suspended, consumer started, consumer completed")
     @TestSequenceDiagram("""

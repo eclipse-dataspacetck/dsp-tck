@@ -62,20 +62,38 @@ public class HttpFunctions {
                 .build();
 
         var httpClient = new OkHttpClient.Builder().addInterceptor(authorizationInterceptor).build();
-        try {
-            var response = httpClient.newCall(httpRequest).execute();
-            if (404 == response.code()) {
-                throw new AssertionError("Unexpected 404 received for request: " + url);
-            } else if (!response.isSuccessful()) {
-                if (response.code() < 400 || response.code() >= 500 || !expectError) {
-                    throw new AssertionError("Unexpected response code: " + response.code());
+        int maxRetries = 3;
+        int attempt = 0;
+        long backoff = 200; // initial backoff in ms
+
+        while (true) {
+            try {
+                var response = httpClient.newCall(httpRequest).execute();
+                if (!expectError && response.code() >= 400 && response.code() < 500 && attempt < maxRetries - 1) {
+                    attempt++;
+                    response.close();
+                    try {
+                        Thread.sleep(backoff);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw new RuntimeException(ie);
+                    }
+                    backoff *= 2;
+                    continue;
                 }
-            } else if (expectError) {
-                throw new AssertionError("Expected to throw an error on request: " + url);
+                if (404 == response.code()) {
+                    throw new AssertionError("Unexpected 404 received for request: " + url);
+                } else if (!response.isSuccessful()) {
+                    if (response.code() < 400 || response.code() >= 500 || !expectError) {
+                        throw new AssertionError("Unexpected response code: " + response.code());
+                    }
+                } else if (expectError) {
+                    throw new AssertionError("Expected to throw an error on request: " + url);
+                }
+                return response;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-            return response;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 

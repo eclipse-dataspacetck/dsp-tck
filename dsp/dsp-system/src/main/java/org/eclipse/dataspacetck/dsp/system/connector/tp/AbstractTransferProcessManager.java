@@ -168,7 +168,11 @@ public abstract class AbstractTransferProcessManager implements TransferProcessM
         }
 
         var endpointType = stringIdProperty(DSPACE_PROPERTY_ENDPOINT_TYPE_EXPANDED, dataAddress);
-        var endpoint = stringProperty(DSPACE_PROPERTY_ENDPOINT_EXPANDED, dataAddress);
+
+        String endpoint = null;
+        if (dataAddress.get(DSPACE_PROPERTY_ENDPOINT_EXPANDED) != null) {
+            endpoint = stringProperty(DSPACE_PROPERTY_ENDPOINT_EXPANDED, dataAddress);
+        }
         var endpointProperties = toEndpointProperties(dataAddress.get(DSPACE_PROPERTY_ENDPOINT_PROPERTIES_EXPANDED));
         return new TransferProcess.DataAddress(endpointType, endpoint, endpointProperties);
     }
