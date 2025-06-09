@@ -19,7 +19,6 @@ import org.eclipse.dataspacetck.core.api.system.CallbackEndpoint;
 import org.eclipse.dataspacetck.core.api.system.HandlerResponse;
 import org.eclipse.dataspacetck.core.api.system.ProtocolHandler;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.extension.ExtensionContext;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -104,10 +103,10 @@ public class DefaultCallbackEndpoint implements CallbackEndpoint, BiFunction<Str
      */
     private Optional<ProtocolHandler> lookupHandler(String expression) {
         return handlers.entrySet()
-                .stream()
-                .filter(entry -> compile(entry.getKey()).matcher(expression).matches())
-                .map(Map.Entry::getValue)
-                .findFirst();
+                       .stream()
+                       .filter(entry -> compile(entry.getKey()).matcher(expression).matches())
+                       .map(Map.Entry::getValue)
+                       .findFirst();
     }
 
     @FunctionalInterface
