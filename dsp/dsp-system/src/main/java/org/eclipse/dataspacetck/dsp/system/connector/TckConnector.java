@@ -26,6 +26,9 @@ import org.eclipse.dataspacetck.dsp.system.connector.catalog.CatalogManagerImpl;
 import org.eclipse.dataspacetck.dsp.system.connector.tp.ConsumerTransferProcessManagerImpl;
 import org.eclipse.dataspacetck.dsp.system.connector.tp.ProviderTransferProcessManagerImpl;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Implements a simple, in-memory connector that supports control-plane operations for testing.
  */
@@ -62,5 +65,11 @@ public class TckConnector implements Connector {
 
     public ProviderTransferProcessManager getProviderTransferProcessManager() {
         return providerTransferProcessManager;
+    }
+
+
+    @Override
+    public Map<String, Object> getMetadata() {
+        return Map.of("protocolVersions", List.of(Map.of("version", "2025-1", "path", "http://example.com/dsp/2025-1")));
     }
 }

@@ -35,6 +35,7 @@ dependencies {
     implementation(project(":dsp:dsp-contract-negotiation"))
     implementation(project(":dsp:dsp-transfer-process"))
     implementation(project(":dsp:dsp-catalog"))
+    implementation(project(":dsp:dsp-metadata"))
     implementation(project(":runtimes:tck-runtime"))
     implementation(libs.junit.platform.launcher)
     testImplementation(project(":dsp:dsp-contract-negotiation"))

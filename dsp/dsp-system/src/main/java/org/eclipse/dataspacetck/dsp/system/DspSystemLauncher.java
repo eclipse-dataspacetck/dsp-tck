@@ -22,6 +22,7 @@ import org.eclipse.dataspacetck.core.spi.system.ServiceResolver;
 import org.eclipse.dataspacetck.core.spi.system.SystemConfiguration;
 import org.eclipse.dataspacetck.core.spi.system.SystemLauncher;
 import org.eclipse.dataspacetck.dsp.system.api.client.catalog.CatalogClient;
+import org.eclipse.dataspacetck.dsp.system.api.client.metadata.MetadataClient;
 import org.eclipse.dataspacetck.dsp.system.api.connector.Connector;
 import org.eclipse.dataspacetck.dsp.system.api.connector.Consumer;
 import org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions;
@@ -41,6 +42,8 @@ import org.eclipse.dataspacetck.dsp.system.client.cn.http.HttpConsumerNegotiatio
 import org.eclipse.dataspacetck.dsp.system.client.cn.http.HttpProviderNegotiationClientImpl;
 import org.eclipse.dataspacetck.dsp.system.client.cn.local.LocalConsumerNegotiationClientImpl;
 import org.eclipse.dataspacetck.dsp.system.client.cn.local.LocalProviderNegotiationClientImpl;
+import org.eclipse.dataspacetck.dsp.system.client.metadata.http.HttpMetadataClient;
+import org.eclipse.dataspacetck.dsp.system.client.metadata.local.LocalMetadataClient;
 import org.eclipse.dataspacetck.dsp.system.client.tp.ConsumerTransferProcessClient;
 import org.eclipse.dataspacetck.dsp.system.client.tp.ProviderTransferProcessClient;
 import org.eclipse.dataspacetck.dsp.system.client.tp.http.HttpConsumerTransferProcessClient;
@@ -76,7 +79,8 @@ import static org.eclipse.dataspacetck.core.api.system.SystemsConstants.TCK_PREF
 public class DspSystemLauncher implements SystemLauncher {
     private static final String LOCAL_CONNECTOR_CONFIG = TCK_PREFIX + ".dsp.local.connector";
     private static final String CONNECTOR_AGENT_ID_CONFIG = TCK_PREFIX + ".dsp.connector.agent.id";
-    private static final String CONNECTOR_BASE_URL_CONFIG = TCK_PREFIX + ".dsp.connector.http.url";
+    private static final String CONNECTOR_PROTOCOL_URL_CONFIG = TCK_PREFIX + ".dsp.connector.http.url";
+    private static final String CONNECTOR_BASE_URL_CONFIG = TCK_PREFIX + ".dsp.connector.http.base.url";
     private static final String CONNECTOR_BASE_AUTHORIZATION_HEADER_CONFIG = TCK_PREFIX + ".dsp.connector.http.headers.authorization";
     private static final String CONNECTOR_INITIATE_URL_CONFIG = TCK_PREFIX + ".dsp.connector.negotiation.initiate.url";
     private static final String CONNECTOR_TRANSFER_INITIATE_URL_CONFIG = TCK_PREFIX + ".dsp.connector.transfer.initiate.url";
@@ -94,11 +98,13 @@ public class DspSystemLauncher implements SystemLauncher {
     private final Map<String, ConsumerNegotiationMock> consumerNegotiationMocks = new ConcurrentHashMap<>();
     private final Map<String, ConsumerNegotiationClient> consumerNegotiationClients = new ConcurrentHashMap<>();
     private final Map<String, CatalogClient> providerCatalogClients = new ConcurrentHashMap<>();
+    private final Map<String, MetadataClient> providerMetadataClients = new ConcurrentHashMap<>();
 
     private Monitor monitor;
     private ExecutorService executor;
     private String connectorUnderTestId = "ANONYMOUS";
-    private String baseConnectorUrl;
+    private String connectorProtocolUrl;
+    private String connectorBaseUrl;
     private String baseAuthorizationHeader;
     private String connectorInitiateUrl;
     private String connectorTransferInitiateUrl;
@@ -112,8 +118,12 @@ public class DspSystemLauncher implements SystemLauncher {
         executor = newFixedThreadPool(configuration.getPropertyAsInt(THREAD_POOL_CONFIG, 10));
         useLocalConnector = configuration.getPropertyAsBoolean(LOCAL_CONNECTOR_CONFIG, false);
         if (!useLocalConnector) {
-            baseConnectorUrl = configuration.getPropertyAsString(CONNECTOR_BASE_URL_CONFIG, null);
-            if (baseConnectorUrl == null) {
+            connectorProtocolUrl = configuration.getPropertyAsString(CONNECTOR_PROTOCOL_URL_CONFIG, null);
+            if (connectorProtocolUrl == null) {
+                throw new RuntimeException("Required configuration not set: " + CONNECTOR_PROTOCOL_URL_CONFIG);
+            }
+            connectorBaseUrl = configuration.getPropertyAsString(CONNECTOR_BASE_URL_CONFIG, null);
+            if (connectorBaseUrl == null) {
                 throw new RuntimeException("Required configuration not set: " + CONNECTOR_BASE_URL_CONFIG);
             }
             baseAuthorizationHeader = configuration.getPropertyAsString(CONNECTOR_BASE_AUTHORIZATION_HEADER_CONFIG, null);
@@ -183,6 +193,8 @@ public class DspSystemLauncher implements SystemLauncher {
             return type.cast(createProviderTransferProcessMock(type, configuration.getScopeId(), configuration, resolver));
         } else if (CatalogClient.class.equals(type)) {
             return type.cast(createCatalogClient(configuration.getScopeId(), configuration, resolver));
+        } else if (MetadataClient.class.equals(type)) {
+            return type.cast(createMetadataClient(configuration.getScopeId(), configuration, resolver));
         }
         return null;
     }
@@ -195,7 +207,7 @@ public class DspSystemLauncher implements SystemLauncher {
         var pipeline = new ProviderNegotiationPipelineImpl(negotiationClient,
                 callbackEndpoint,
                 consumerConnector,
-                baseConnectorUrl,
+                connectorProtocolUrl,
                 connectorUnderTestId,
                 monitor,
                 waitTime);
@@ -254,7 +266,7 @@ public class DspSystemLauncher implements SystemLauncher {
             if (useLocalConnector) {
                 return new LocalProviderNegotiationClientImpl(providerConnectors.computeIfAbsent(scopeId, k2 -> new TckConnector(monitor)));
             }
-            return new HttpProviderNegotiationClientImpl(baseConnectorUrl, monitor);
+            return new HttpProviderNegotiationClientImpl(connectorProtocolUrl, monitor);
         });
     }
 
@@ -296,7 +308,7 @@ public class DspSystemLauncher implements SystemLauncher {
         return new ProviderTransferProcessPipelineImpl(negotiationClient,
                 callbackEndpoint,
                 consumerConnector,
-                baseConnectorUrl,
+                connectorProtocolUrl,
                 connectorUnderTestId,
                 monitor,
                 waitTime);
@@ -327,7 +339,7 @@ public class DspSystemLauncher implements SystemLauncher {
             if (useLocalConnector) {
                 return new LocalProviderTransferProcessClient(providerConnectors.computeIfAbsent(scopeId, k2 -> new TckConnector(monitor)));
             }
-            return new HttpProviderTransferProcessClient(baseConnectorUrl, monitor);
+            return new HttpProviderTransferProcessClient(connectorProtocolUrl, monitor);
         });
     }
 
@@ -364,7 +376,16 @@ public class DspSystemLauncher implements SystemLauncher {
             if (useLocalConnector) {
                 return new LocalCatalogClient(providerConnectors.computeIfAbsent(scopeId, k2 -> new TckConnector(monitor)));
             }
-            return new HttpCatalogClient(baseConnectorUrl, monitor);
+            return new HttpCatalogClient(connectorProtocolUrl, monitor);
+        });
+    }
+
+    private MetadataClient createMetadataClient(String scopeId, ServiceConfiguration configuration, ServiceResolver resolver) {
+        return providerMetadataClients.computeIfAbsent(scopeId, k -> {
+            if (useLocalConnector) {
+                return new LocalMetadataClient(providerConnectors.computeIfAbsent(scopeId, k2 -> new TckConnector(monitor)));
+            }
+            return new HttpMetadataClient(connectorBaseUrl, monitor);
         });
     }
 }

@@ -18,6 +18,8 @@ import org.eclipse.dataspacetck.dsp.system.api.connector.catalog.CatalogManager;
 import org.eclipse.dataspacetck.dsp.system.api.connector.tp.ConsumerTransferProcessManager;
 import org.eclipse.dataspacetck.dsp.system.api.connector.tp.ProviderTransferProcessManager;
 
+import java.util.Map;
+
 /**
  * The TCK Connector implementation.
  */
@@ -47,4 +49,11 @@ public interface Connector {
      * Returns the manager for catalog operations.
      */
     CatalogManager getCatalogManager();
+
+    /**
+     * Returns metadata about the connector.
+     *
+     * @return a map containing metadata information
+     */
+    Map<String, Object> getMetadata();
 }

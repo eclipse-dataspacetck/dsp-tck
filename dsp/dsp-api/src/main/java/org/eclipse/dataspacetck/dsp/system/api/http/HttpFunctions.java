@@ -69,7 +69,7 @@ public class HttpFunctions {
         while (true) {
             try {
                 var response = httpClient.newCall(httpRequest).execute();
-                if (!expectError && response.code() >= 400 && response.code() < 500 && attempt < maxRetries - 1) {
+                if (!expectError && response.code() != 404 && response.code() >= 400 && response.code() < 500 && attempt < maxRetries - 1) {
                     attempt++;
                     response.close();
                     try {

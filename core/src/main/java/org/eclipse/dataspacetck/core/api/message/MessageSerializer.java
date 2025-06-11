@@ -114,6 +114,15 @@ public class MessageSerializer {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> processJson(InputStream stream) {
+        try {
+            return MAPPER.readValue(stream, Map.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static Map<String, Object> processJsonLd(Map<String, Object> message) {
         return processJsonLd(MAPPER.convertValue(message, JsonObject.class));
     }
