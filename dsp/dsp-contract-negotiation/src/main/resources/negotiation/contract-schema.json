@@ -42,7 +42,14 @@
         "permission": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Permission"
+            "$ref": "#/definitions/Rule"
+          },
+          "minItems": 1
+        },
+        "prohibition": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Rule"
           },
           "minItems": 1
         },
@@ -69,6 +76,9 @@
             "@type": {
               "type": "string",
               "const": "Offer"
+            },
+            "target": {
+              "type": "string"
             }
           }
         },
@@ -95,7 +105,29 @@
       "type": "object",
       "allOf": [
         {
-          "$ref": "#/definitions/MessageOffer"
+          "$ref": "#/definitions/PolicyClass"
+        },
+        {
+          "properties": {
+            "@type": {
+              "type": "string",
+              "const": "Offer"
+            }
+          }
+        },
+        {
+          "anyOf": [
+            {
+              "required": [
+                "permission"
+              ]
+            },
+            {
+              "required": [
+                "prohibition"
+              ]
+            }
+          ]
         }
       ],
       "not": {
@@ -153,7 +185,7 @@
         "assigner"
       ]
     },
-    "Permission": {
+    "Rule": {
       "type": "object",
       "properties": {
         "action": {
@@ -166,7 +198,10 @@
           }
         },
         "duty": {
-          "$ref": "#/definitions/Duty"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Duty"
+          }
         }
       },
       "required": [
