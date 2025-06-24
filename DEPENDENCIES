@@ -1,6 +1,6 @@
 maven/mavencentral/com.apicatalog/titanium-json-ld/1.4.1, Apache-2.0, approved, #15200
 maven/mavencentral/com.fasterxml.jackson.core/jackson-annotations/2.19.1, Apache-2.0, approved, #21911
-maven/mavencentral/com.fasterxml.jackson.core/jackson-core/2.19.1, MIT AND Apache-2.0, approved, #21917
+maven/mavencentral/com.fasterxml.jackson.core/jackson-core/2.19.1, Apache-2.0 AND MIT, approved, #21916
 maven/mavencentral/com.fasterxml.jackson.core/jackson-databind/2.19.1, Apache-2.0, approved, #21909
 maven/mavencentral/com.fasterxml.jackson.datatype/jackson-datatype-jakarta-jsonp/2.19.1, Apache-2.0, approved, #20841
 maven/mavencentral/com.fasterxml.jackson/jackson-bom/2.19.1, Apache-2.0, approved, #20843
@@ -32,8 +32,8 @@ maven/mavencentral/org.apiguardian/apiguardian-api/1.1.2, Apache-2.0, approved, 
 maven/mavencentral/org.assertj/assertj-core/3.26.3, Apache-2.0, approved, #14886
 maven/mavencentral/org.awaitility/awaitility/4.2.0, Apache-2.0, approved, #14178
 maven/mavencentral/org.checkerframework/checker-qual/3.12.0, MIT, approved, clearlydefined
-maven/mavencentral/org.eclipse.dataspacetck.common/core-api/0.1.1-SNAPSHOT, Apache-2.0, approved, technology.dataspacetck
-maven/mavencentral/org.eclipse.dataspacetck.common/test-plan-generator/0.1.1-SNAPSHOT, Apache-2.0, approved, technology.dataspacetck
+maven/mavencentral/org.eclipse.dataspacetck.common/core-api/1.0.0-SNAPSHOT, Apache-2.0, approved, technology.dataspacetck
+maven/mavencentral/org.eclipse.dataspacetck.common/test-plan-generator/1.0.0-SNAPSHOT, Apache-2.0, approved, technology.dataspacetck
 maven/mavencentral/org.eclipse.elk/org.eclipse.elk.alg.common/0.9.1, EPL-2.0, approved, modeling.elk
 maven/mavencentral/org.eclipse.elk/org.eclipse.elk.alg.layered/0.9.1, EPL-2.0, approved, modeling.elk
 maven/mavencentral/org.eclipse.elk/org.eclipse.elk.alg.mrtree/0.9.1, EPL-2.0, approved, modeling.elk
