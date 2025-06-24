@@ -16,6 +16,10 @@ name: "Publish Snapshot Docker image"
 
 on:
   workflow_dispatch:
+    inputs:
+      docker_tag:
+        description: "Additional Docker tags to be applied to the image"
+        required: false
   workflow_call:
 
 jobs:
@@ -49,4 +53,5 @@ jobs:
           namespace: "eclipsedataspacetck"
           docker_user: ${{ secrets.DOCKER_HUB_USER }}
           docker_token: ${{ secrets.DOCKER_HUB_TOKEN }}
+          docker_tag: ${{ inputs.docker_tag  }}
 
