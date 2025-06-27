@@ -49,8 +49,7 @@ public class ProviderActions {
                 randomUUID().toString(),
                 randomUUID().toString(),
                 negotiation.getCounterPartyId(),
-                TCK_PARTICIPANT_ID,
-                "empty");
+                TCK_PARTICIPANT_ID);
 
         negotiation.transition(OFFERED);
         var url = format(NEGOTIATION_OFFER_TEMPLATE, negotiation.getCallbackAddress(), negotiation.getCorrelationId());

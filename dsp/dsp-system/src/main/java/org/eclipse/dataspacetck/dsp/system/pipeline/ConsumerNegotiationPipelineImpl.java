@@ -94,7 +94,7 @@ public class ConsumerNegotiationPipelineImpl extends AbstractNegotiationPipeline
             var offerId = providerNegotiation.getOfferId();
             var datasetId = providerNegotiation.getDatasetId();
             var assignee = providerNegotiation.getCounterPartyId();
-            var offerMessage = createOffer(providerId, consumerId, offerId, TCK_PARTICIPANT_ID, assignee, datasetId, endpoint.getAddress());
+            var offerMessage = createOffer(providerId, consumerId, offerId, TCK_PARTICIPANT_ID, assignee, datasetId);
             monitor.debug("Sending offer");
             var consumerAddress = providerNegotiation.getCallbackAddress();
             negotiationClient.contractOffer(consumerId, offerMessage, consumerAddress, expectError);
