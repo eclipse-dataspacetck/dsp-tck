@@ -10,7 +10,7 @@ jsonapi = "2.0.0"
 jupiter = "5.13.2"
 okhttp = "4.12.0"
 mockito = "5.18.0"
-tck = "1.0.0-SNAPSHOT"
+tck = "1.0.0-RC4-SNAPSHOT"
 titanium = "1.4.1"
 schema-validator = "1.5.7"
 
