@@ -75,7 +75,6 @@ maven/mavencentral/org.junit.platform/junit-platform-suite-api/1.13.4, EPL-2.0, 
 maven/mavencentral/org.junit.platform/junit-platform-suite-commons/1.13.2, EPL-2.0, approved, #21704
 maven/mavencentral/org.junit.platform/junit-platform-suite-commons/1.13.4, EPL-2.0, approved, #21704
 maven/mavencentral/org.junit.platform/junit-platform-suite-engine/1.13.2, EPL-2.0, approved, #21703
-maven/mavencentral/org.junit.platform/junit-platform-suite-engine/1.13.3, EPL-2.0, approved, #21703
 maven/mavencentral/org.junit.platform/junit-platform-suite-engine/1.13.4, EPL-2.0, approved, #21703
 maven/mavencentral/org.junit/junit-bom/5.13.2, EPL-2.0, approved, #21846
 maven/mavencentral/org.junit/junit-bom/5.13.4, EPL-2.0, approved, #21846
