@@ -56,7 +56,7 @@ public class Metadata01Test extends AbstractVerificationTest {
             assertThat(entry.get("version")).isNotNull()
                     .isEqualTo("2025-1");
             assertThat(entry.get("path")).isNotNull();
-            assertThat(entry.get("binding")).isNull();
+            assertThat(entry.get("binding")).isNotNull();
         });
 
     }
