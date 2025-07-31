@@ -70,6 +70,6 @@ public class TckConnector implements Connector {
 
     @Override
     public Map<String, Object> getMetadata() {
-        return Map.of("protocolVersions", List.of(Map.of("version", "2025-1", "path", "http://example.com/dsp/2025-1")));
+        return Map.of("protocolVersions", List.of(Map.of("version", "2025-1", "path", "http://example.com/dsp/2025-1", "binding", "HTTPS")));
     }
 }
