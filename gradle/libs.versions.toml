@@ -34,7 +34,7 @@ schema-validator = { module = "com.networknt:json-schema-validator", version.ref
 
 [plugins]
 docker = { id = "com.bmuschko.docker-remote-api", version = "9.4.0" }
-shadow = { id = "com.gradleup.shadow", version = "8.3.8" }
+shadow = { id = "com.gradleup.shadow", version = "8.3.9" }
 nexuspublishing = { id = "io.github.gradle-nexus.publish-plugin", version = "2.0.0" }
 tck-build = { id = "org.eclipse.dataspacetck.build.tck-build", version.ref = "tck" }
 tck-generator = { id = "org.eclipse.dataspacetck.build.tck-build", version.ref = "tck" }
