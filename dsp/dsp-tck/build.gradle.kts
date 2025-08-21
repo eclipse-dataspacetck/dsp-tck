@@ -48,6 +48,7 @@ configure<DockerExtension> {
 }
 tasks.withType<ShadowJar> {
     exclude("**/pom.properties", "**/pom.xml")
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     mergeServiceFiles()
     archiveFileName.set("${project.name}-runtime.jar") // should be something other than "dsp-tck.jar", to avoid erroneous task dependencies
 

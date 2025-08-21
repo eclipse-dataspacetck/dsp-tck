@@ -63,6 +63,7 @@ allprojects {
 
     dependencies {
         implementation(rootProject.libs.json.api)
+        implementation(rootProject.libs.parsson)
         implementation(rootProject.libs.jackson.databind)
         implementation(rootProject.libs.jackson.jsonp)
         implementation(rootProject.libs.titanium)
