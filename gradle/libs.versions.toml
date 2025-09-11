@@ -11,7 +11,7 @@ parsson = "1.1.7"
 jupiter = "5.13.4"
 okhttp = "5.1.0"
 mockito = "5.19.0"
-tck = "1.0.0-RC5-SNAPSHOT"
+tck = "1.0.0-RC5"
 titanium = "1.4.1"
 schema-validator = "1.5.8"
 
