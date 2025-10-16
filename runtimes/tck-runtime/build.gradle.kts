@@ -18,4 +18,5 @@ dependencies {
     implementation(libs.junit.platform.engine)
 
     implementation(project(":boot"))
+    implementation(project(":core"))
 }

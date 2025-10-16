@@ -211,22 +211,19 @@ specific [tests](#12--dataspace-protocol-test-modules-and-packages)
 void assertDspCompatibility() throws IOException {
     // boostrap CUT runtime
 
-    var monitor = new ConsoleMonitor(true, true);
-
-    var result = TckRuntime.Builder.newInstance()
+    var runtime = TckRuntime.Builder.newInstance()
             .properties(Map.of()) // Add any additional properties if needed
             .addPackage("org.eclipse.dataspacetck.dsp.verification")
-            .monitor(monitor)
-            .build()
-            .execute();
+            .launcher(DspSystemLauncher.class) // it could be also configured with the 'dataspacetck.launcher' property
+            .monitor(new ConsoleMonitor(true, true))
+            .build();
 
-    if (!result.getFailures().isEmpty()) {
-        var failures = result.getFailures().stream()
-                .map(f -> "- " + f.getTestIdentifier().getDisplayName() + " (" + f.getException() + ")")
-                .collect(Collectors.joining("\n"));
-        Assertions.fail(result.getTotalFailureCount() + " TCK test cases failed:\n" + failures);
-    }
+    var summary = runtime.execute();
 
+    assertThat(summary.getFailures())
+            .extracting(f -> "- " + f.getTestIdentifier().getDisplayName() + " (" + f.getException() + ")")
+            .isEmpty();
+    assertThat(summary.getTestsSucceededCount()).isGreaterThan(0);
 }
 ```
 

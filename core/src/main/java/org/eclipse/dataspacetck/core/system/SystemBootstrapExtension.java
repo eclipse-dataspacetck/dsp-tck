@@ -182,7 +182,7 @@ public class SystemBootstrapExtension implements BeforeAllCallback,
     private Object resolve(Class<?> type, ExtensionContext context) {
         if (type.equals(CallbackEndpoint.class)) {
             var endpoint = context.getStore(CALLBACK_NAMESPACE).getOrComputeIfAbsent("callback", k -> attachCallbackEndpoint(dispatchingHandler, context));
-            // var endpoint = attachCallbackEndpoint(dispatchingHandler, context);
+
             context.getStore(CALLBACK_NAMESPACE).put("callback", endpoint);
             return type.cast(endpoint);
         }
@@ -204,14 +204,14 @@ public class SystemBootstrapExtension implements BeforeAllCallback,
         var launcherClass = context.getConfigurationParameter(TCK_LAUNCHER).orElse(propertyOrEnv(TCK_LAUNCHER, null));
 
         if (launcherClass == null) {
-            return new NoOpSystemLauncher();
-        } else {
-            try {
-                return (SystemLauncher) getClass().getClassLoader().loadClass(launcherClass).getDeclaredConstructor().newInstance();
-            } catch (ClassNotFoundException | InvocationTargetException | InstantiationException |
-                     IllegalAccessException | NoSuchMethodException e) {
-                throw new RuntimeException("Unable to create Launcher class: " + launcherClass, e);
-            }
+            throw new IllegalArgumentException("Launcher property '%s' missing.".formatted(TCK_LAUNCHER));
+        }
+
+        try {
+            return (SystemLauncher) getClass().getClassLoader().loadClass(launcherClass).getDeclaredConstructor().newInstance();
+        } catch (ClassNotFoundException | InvocationTargetException | InstantiationException |
+                 IllegalAccessException | NoSuchMethodException e) {
+            throw new IllegalArgumentException("Unable to create Launcher class: " + launcherClass + ". Cause: " + e.getMessage(), e);
         }
     }
 
@@ -261,14 +261,6 @@ public class SystemBootstrapExtension implements BeforeAllCallback,
             exchange.sendResponseHeaders(404, 0);
             exchange.close();
         }
-    }
-
-    private static class NoOpSystemLauncher implements SystemLauncher {
-
-        @Override
-        public void start(SystemConfiguration configuration) {
-        }
-
     }
 
 }

@@ -15,6 +15,7 @@
 package org.eclipse.dataspacetck.runtime;
 
 import org.eclipse.dataspacetck.core.spi.boot.Monitor;
+import org.eclipse.dataspacetck.core.spi.system.SystemLauncher;
 import org.junit.platform.engine.discovery.DiscoverySelectors;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.core.LauncherFactory;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.eclipse.dataspacetck.core.api.system.SystemsConstants.TCK_LAUNCHER;
 import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNamePatterns;
 
 /**
@@ -36,11 +38,16 @@ public class TckRuntime {
     private final List<String> packages = new ArrayList<>();
     private final Map<String, String> properties = new HashMap<>();
     private Monitor monitor;
+    private Class<? extends SystemLauncher> launcher;
 
     private TckRuntime() {
     }
 
     public TestExecutionSummary execute() {
+        if (launcher != null) {
+            properties.put(TCK_LAUNCHER, launcher.getName());
+        }
+
         properties.forEach(System::setProperty);
 
         var summaryListener = new SummaryGeneratingListener();
@@ -60,10 +67,10 @@ public class TckRuntime {
     }
 
     public static class Builder {
-        private final TckRuntime launcher;
+        private final TckRuntime runtime;
 
         private Builder() {
-            launcher = new TckRuntime();
+            runtime = new TckRuntime();
         }
 
         public static Builder newInstance() {
@@ -71,27 +78,32 @@ public class TckRuntime {
         }
 
         public Builder property(String key, String value) {
-            launcher.properties.put(key, value);
+            runtime.properties.put(key, value);
             return this;
         }
 
         public Builder properties(Map<String, String> properties) {
-            launcher.properties.putAll(properties);
+            runtime.properties.putAll(properties);
             return this;
         }
 
         public Builder addPackage(String pkg) {
-            launcher.packages.add(pkg);
+            runtime.packages.add(pkg);
+            return this;
+        }
+
+        public Builder monitor(Monitor monitor) {
+            runtime.monitor = monitor;
+            return this;
+        }
+
+        public Builder launcher(Class<? extends SystemLauncher> launcher) {
+            runtime.launcher = launcher;
             return this;
         }
 
         public TckRuntime build() {
-            return launcher;
-        }
-
-        public Builder monitor(Monitor monitor) {
-            this.launcher.monitor = monitor;
-            return this;
+            return runtime;
         }
 
     }

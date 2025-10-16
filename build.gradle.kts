@@ -58,7 +58,6 @@ allprojects {
 
     tasks.test {
         useJUnitPlatform()
-        systemProperty("dataspacetck.launcher", "org.eclipse.dataspacetck.dsp.system.DspSystemLauncher")
     }
 
     dependencies {
