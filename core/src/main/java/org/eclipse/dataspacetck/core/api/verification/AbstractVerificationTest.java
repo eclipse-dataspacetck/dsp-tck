@@ -15,17 +15,16 @@
 
 package org.eclipse.dataspacetck.core.api.verification;
 
-import com.networknt.schema.JsonSchemaFactory;
+import com.networknt.schema.Error;
 import com.networknt.schema.SchemaLocation;
-import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.SchemaRegistry;
+import com.networknt.schema.dialect.Dialects;
 import org.eclipse.dataspacetck.core.api.message.MessageValidator;
 import org.eclipse.dataspacetck.core.system.SystemBootstrapExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.networknt.schema.SpecVersion.VersionFlag.V202012;
 
 
 /**
@@ -37,9 +36,9 @@ public abstract class AbstractVerificationTest {
     protected static final String CLASSPATH_SCHEMA = "classpath:/";
     protected static final String DSPACE_NAMESPACE = "https://w3id.org/dspace/2025/1";
 
-    private static final JsonSchemaFactory SCHEMA_FACTORY = JsonSchemaFactory.getInstance(V202012, builder ->
-            builder.schemaMappers(schemaMappers ->
-                    schemaMappers.mapPrefix(DSPACE_NAMESPACE + "/", CLASSPATH_SCHEMA))
+    private static final SchemaRegistry SCHEMA_FACTORY = SchemaRegistry.withDialect(Dialects.getDraft201909(), builder ->
+            builder.schemaIdResolvers(schemaIdResolvers ->
+                    schemaIdResolvers.mapPrefix(DSPACE_NAMESPACE + "/", CLASSPATH_SCHEMA))
     );
 
 
@@ -51,7 +50,7 @@ public abstract class AbstractVerificationTest {
             if (response.isEmpty()) {
                 return List.of();
             }
-            return response.stream().map(ValidationMessage::getMessage).collect(Collectors.toList());
+            return response.stream().map(Error::getMessage).collect(Collectors.toList());
         };
     }
 }
