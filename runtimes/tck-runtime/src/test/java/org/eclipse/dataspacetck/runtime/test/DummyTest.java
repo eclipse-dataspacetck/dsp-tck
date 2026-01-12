@@ -15,6 +15,7 @@
 package org.eclipse.dataspacetck.runtime.test;
 
 import org.eclipse.dataspacetck.core.system.SystemBootstrapExtension;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,5 +30,12 @@ public class DummyTest {
     void name() {
         // this test exists only to permit to test TckRuntime
         assertThat(true).isTrue();
+    }
+
+    @Test
+    @DisplayName("FILTER")
+    void anotherTest() {
+        // this test exists to show how it can be possible to filter tests by display name content
+        assertThat(1).isEqualTo(1);
     }
 }

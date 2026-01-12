@@ -80,6 +80,21 @@ public class TckRuntimeTest {
         });
     }
 
+    @Test
+    void canFilterByTestName() {
+        var runtime = TckRuntime.Builder.newInstance()
+                .monitor(mock())
+                .launcher(TestSystemLauncher.class)
+                .addPackage("org.eclipse.dataspacetck.runtime.test")
+                .displayNameMatching(displayName -> displayName.equals("FILTER"))
+                .build();
+
+        var summary = runtime.execute();
+
+        assertThat(summary.getTestsSucceededCount()).isEqualTo(1);
+        assertThat(summary.getTestsFoundCount()).isEqualTo(1);
+    }
+
     public static class TestSystemLauncher implements SystemLauncher {
 
         @Override

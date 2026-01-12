@@ -16,7 +16,9 @@ package org.eclipse.dataspacetck.runtime;
 
 import org.eclipse.dataspacetck.core.spi.boot.Monitor;
 import org.eclipse.dataspacetck.core.spi.system.SystemLauncher;
+import org.junit.platform.engine.FilterResult;
 import org.junit.platform.engine.discovery.DiscoverySelectors;
+import org.junit.platform.launcher.PostDiscoveryFilter;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.core.LauncherFactory;
 import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
@@ -26,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static org.eclipse.dataspacetck.core.api.system.SystemsConstants.TCK_LAUNCHER;
 import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNamePatterns;
@@ -39,6 +42,7 @@ public class TckRuntime {
     private final Map<String, String> properties = new HashMap<>();
     private Monitor monitor;
     private Class<? extends SystemLauncher> launcher;
+    private Predicate<String> displayNameMatching;
 
     private TckRuntime() {
     }
@@ -52,11 +56,18 @@ public class TckRuntime {
 
         var summaryListener = new SummaryGeneratingListener();
 
-        var request = LauncherDiscoveryRequestBuilder.request()
+        var requestBuilder = LauncherDiscoveryRequestBuilder.request()
                 .filters(includeClassNamePatterns(TEST_POSTFIX))
-                .selectors(packages.stream().map(DiscoverySelectors::selectPackage).toList())
-                .build();
+                .selectors(packages.stream().map(DiscoverySelectors::selectPackage).toList());
 
+
+        if (displayNameMatching != null) {
+            requestBuilder.filters((PostDiscoveryFilter) descriptor -> displayNameMatching.test(descriptor.getDisplayName())
+                    ? FilterResult.included("Matches display name")
+                    : FilterResult.excluded("Does not match display name"));
+        }
+
+        var request = requestBuilder.build();
         var launcher = LauncherFactory.create();
         launcher.registerTestExecutionListeners(new TckExecutionListener(monitor));
         launcher.registerTestExecutionListeners(summaryListener);
@@ -99,6 +110,18 @@ public class TckRuntime {
 
         public Builder launcher(Class<? extends SystemLauncher> launcher) {
             runtime.launcher = launcher;
+            return this;
+        }
+
+        /**
+         * Permit to filter tests by the content of @DisplayName annotation. If the predicate matches the test is included,
+         * excluded otherwise.
+         *
+         * @param displayNameMatching the predicate.
+         * @return the builder.
+         */
+        public Builder displayNameMatching(Predicate<String> displayNameMatching) {
+            runtime.displayNameMatching = displayNameMatching;
             return this;
         }
 
