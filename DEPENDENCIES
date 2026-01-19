@@ -2,14 +2,14 @@ maven/mavencentral/com.apicatalog/titanium-jcs/1.1.1, Apache-2.0, approved, #250
 maven/mavencentral/com.apicatalog/titanium-json-ld/1.7.0, Apache-2.0, approved, #25089
 maven/mavencentral/com.apicatalog/titanium-rdf-api/1.0.0, Apache-2.0, approved, #20245
 maven/mavencentral/com.apicatalog/titanium-rdf-n-quads/1.0.2, Apache-2.0, approved, #20243
-maven/mavencentral/com.fasterxml.jackson.core/jackson-annotations/2.20, Apache-2.0, approved, #23056
-maven/mavencentral/com.fasterxml.jackson.core/jackson-core/2.20.1, MIT AND Apache-2.0, approved, #23054
-maven/mavencentral/com.fasterxml.jackson.core/jackson-databind/2.20.1, Apache-2.0, approved, #23060
-maven/mavencentral/com.fasterxml.jackson.datatype/jackson-datatype-jakarta-jsonp/2.20.1, , restricted, clearlydefined
-maven/mavencentral/com.fasterxml.jackson/jackson-bom/2.20.1, , restricted, clearlydefined
+maven/mavencentral/com.fasterxml.jackson.core/jackson-annotations/2.21, Apache-2.0, approved, #25587
+maven/mavencentral/com.fasterxml.jackson.core/jackson-core/2.21.0, MIT AND Apache-2.0 AND (Apache-2.0 AND LicenseRef-scancode-free-unknown AND MIT), restricted, #25590
+maven/mavencentral/com.fasterxml.jackson.core/jackson-databind/2.21.0, Apache-2.0, approved, #25591
+maven/mavencentral/com.fasterxml.jackson.datatype/jackson-datatype-jakarta-jsonp/2.21.0, , restricted, clearlydefined
+maven/mavencentral/com.fasterxml.jackson/jackson-bom/2.21.0, , restricted, clearlydefined
 maven/mavencentral/com.google.code.findbugs/jsr305/3.0.2, Apache-2.0 and CC-BY-2.5, approved, #15220
 maven/mavencentral/com.google.errorprone/error_prone_annotations/2.36.0, Apache-2.0, approved, #18702
-maven/mavencentral/com.google.errorprone/error_prone_annotations/2.42.0, Apache-2.0, approved, #23390
+maven/mavencentral/com.google.errorprone/error_prone_annotations/2.46.0, Apache-2.0, approved, #25558
 maven/mavencentral/com.google.guava/failureaccess/1.0.3, Apache-2.0, approved, CQ22654
 maven/mavencentral/com.google.guava/guava/33.4.8-jre, Apache-2.0 AND CC0-1.0 AND CC-PDDC, approved, #17939
 maven/mavencentral/com.google.guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava, Apache-2.0, approved, CQ22657
