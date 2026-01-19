@@ -24,7 +24,7 @@ plugins {
     `jacoco-report-aggregation`
     alias(libs.plugins.docker)
     alias(libs.plugins.nexuspublishing)
-    alias(libs.plugins.tck.build)
+    alias(libs.plugins.tck.build) apply false
 }
 
 buildscript {
