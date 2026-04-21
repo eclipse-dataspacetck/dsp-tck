@@ -101,6 +101,7 @@ public abstract class AbstractAsyncPipeline<P extends AsyncPipeline<P>> implemen
 
     public void execute() {
         stages.forEach(Runnable::run);
+        stages.clear();
     }
 
     protected P addHandlerAction(String path, Consumer<Map<String, Object>> action) {
