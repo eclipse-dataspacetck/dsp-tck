@@ -19,6 +19,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import org.eclipse.dataspacetck.core.api.system.CallbackEndpoint;
+import org.eclipse.dataspacetck.core.spi.boot.Monitor;
 import org.eclipse.dataspacetck.core.spi.system.ServiceConfiguration;
 import org.eclipse.dataspacetck.core.spi.system.SystemConfiguration;
 import org.eclipse.dataspacetck.core.spi.system.SystemLauncher;
@@ -41,7 +42,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static java.lang.Boolean.parseBoolean;
 import static org.eclipse.dataspacetck.core.api.system.SystemsConstants.TCK_CALLBACK_ADDRESS;
 import static org.eclipse.dataspacetck.core.api.system.SystemsConstants.TCK_DEFAULT_CALLBACK_ADDRESS;
 import static org.eclipse.dataspacetck.core.api.system.SystemsConstants.TCK_DEFAULT_HOST;
@@ -50,8 +50,6 @@ import static org.eclipse.dataspacetck.core.api.system.SystemsConstants.TCK_HOST
 import static org.eclipse.dataspacetck.core.api.system.SystemsConstants.TCK_LAUNCHER;
 import static org.eclipse.dataspacetck.core.api.system.SystemsConstants.TCK_PORT;
 import static org.eclipse.dataspacetck.core.system.ConfigFunctions.propertyOrEnv;
-import static org.eclipse.dataspacetck.core.system.ConsoleMonitor.ANSI_PROPERTY;
-import static org.eclipse.dataspacetck.core.system.ConsoleMonitor.DEBUG_PROPERTY;
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL;
 
 public class SystemBootstrapExtension implements BeforeAllCallback,
@@ -66,7 +64,7 @@ public class SystemBootstrapExtension implements BeforeAllCallback,
     private static SystemLauncher launcher;
     private static DispatchingHandler dispatchingHandler;
     private static HttpServer server;
-    private static ConsoleMonitor monitor;
+    private static Monitor monitor;
     private String callbackHost;
     private int callbackPort;
     private ExecutorService executorService;
@@ -79,15 +77,12 @@ public class SystemBootstrapExtension implements BeforeAllCallback,
         started = true;
         context.getRoot().getStore(GLOBAL).put(SystemBootstrapExtension.class.getName() + "-initialized", this);
 
+        monitor = (Monitor) context.getStore(GLOBAL).get(Monitor.class.getName());
         launcher = initializeLauncher(context);
-
-        var ansi = parseBoolean(context.getConfigurationParameter(ANSI_PROPERTY).orElse(propertyOrEnv(ANSI_PROPERTY, "true")));
-        var debug = parseBoolean(context.getConfigurationParameter(DEBUG_PROPERTY).orElse(propertyOrEnv(DEBUG_PROPERTY, "false")));
 
         this.callbackHost = context.getConfigurationParameter(TCK_HOST).orElse(TCK_DEFAULT_HOST);
         this.callbackPort = context.getConfigurationParameter(TCK_PORT).map(Integer::parseInt).orElse(TCK_DEFAULT_PORT);
 
-        monitor = new ConsoleMonitor(debug, ansi);
         var configuration = SystemConfiguration.Builder.newInstance()
                 .propertyDelegate(k -> context.getConfigurationParameter(k).orElse(propertyOrEnv(k, null)))
                 .monitor(monitor)

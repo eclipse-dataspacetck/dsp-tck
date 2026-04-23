@@ -14,8 +14,8 @@
  */
 
 dependencies {
-    implementation(libs.junit.platform.launcher)
-    implementation(libs.junit.platform.engine)
+    api(libs.junit.platform.launcher)
+    api(libs.junit.platform.engine)
 
     implementation(project(":boot"))
     implementation(project(":core"))
