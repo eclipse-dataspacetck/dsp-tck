@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.dataspacetck.core.api.system.SystemsConstants.TCK_LAUNCHER;
-import static org.mockito.Mockito.mock;
 
 public class TckRuntimeTest {
 
@@ -39,7 +38,6 @@ public class TckRuntimeTest {
     @Test
     void shouldOverrideLauncherProperty_whenLauncherClassPassed() {
         var runtime = TckRuntime.Builder.newInstance()
-                .monitor(mock())
                 .property(TCK_LAUNCHER, "any.other.LauncherClass")
                 .launcher(TestSystemLauncher.class)
                 .addPackage("org.eclipse.dataspacetck.runtime.test")
@@ -53,7 +51,6 @@ public class TckRuntimeTest {
     @Test
     void shouldFail_whenNoLauncherProvided() {
         var runtime = TckRuntime.Builder.newInstance()
-                .monitor(mock())
                 .addPackage("org.eclipse.dataspacetck.runtime.test")
                 .build();
 
@@ -67,7 +64,6 @@ public class TckRuntimeTest {
     @Test
     void shouldFail_whenUnexistingLauncherProvided() {
         var runtime = TckRuntime.Builder.newInstance()
-                .monitor(mock())
                 .property(TCK_LAUNCHER, "an.unexistent.Launcher")
                 .addPackage("org.eclipse.dataspacetck.runtime.test")
                 .build();
@@ -83,7 +79,6 @@ public class TckRuntimeTest {
     @Test
     void canFilterByTestName() {
         var runtime = TckRuntime.Builder.newInstance()
-                .monitor(mock())
                 .launcher(TestSystemLauncher.class)
                 .addPackage("org.eclipse.dataspacetck.runtime.test")
                 .displayNameMatching(displayName -> displayName.equals("FILTER"))

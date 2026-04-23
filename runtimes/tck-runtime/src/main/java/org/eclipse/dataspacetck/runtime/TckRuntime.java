@@ -16,9 +16,15 @@ package org.eclipse.dataspacetck.runtime;
 
 import org.eclipse.dataspacetck.core.spi.boot.Monitor;
 import org.eclipse.dataspacetck.core.spi.system.SystemLauncher;
+import org.eclipse.dataspacetck.core.system.ConsoleMonitor;
+import org.jetbrains.annotations.NotNull;
 import org.junit.platform.engine.FilterResult;
 import org.junit.platform.engine.discovery.DiscoverySelectors;
+import org.junit.platform.engine.support.store.Namespace;
+import org.junit.platform.launcher.LauncherSession;
+import org.junit.platform.launcher.LauncherSessionListener;
 import org.junit.platform.launcher.PostDiscoveryFilter;
+import org.junit.platform.launcher.core.LauncherConfig;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.core.LauncherFactory;
 import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
@@ -30,7 +36,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import static java.lang.Boolean.parseBoolean;
 import static org.eclipse.dataspacetck.core.api.system.SystemsConstants.TCK_LAUNCHER;
+import static org.eclipse.dataspacetck.core.system.ConfigFunctions.propertyOrEnv;
+import static org.eclipse.dataspacetck.core.system.ConsoleMonitor.ANSI_PROPERTY;
+import static org.eclipse.dataspacetck.core.system.ConsoleMonitor.DEBUG_PROPERTY;
 import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNamePatterns;
 
 /**
@@ -68,7 +78,11 @@ public class TckRuntime {
         }
 
         var request = requestBuilder.build();
-        var launcher = LauncherFactory.create();
+        LauncherConfig launcherConfig = LauncherConfig.builder()
+                .addLauncherSessionListeners(new StoreMonitorSessionListener(monitor))
+                .build();
+
+        var launcher = LauncherFactory.create(launcherConfig);
         launcher.registerTestExecutionListeners(new TckExecutionListener(monitor));
         launcher.registerTestExecutionListeners(summaryListener);
         launcher.discover(request);
@@ -126,9 +140,29 @@ public class TckRuntime {
         }
 
         public TckRuntime build() {
+            if (runtime.monitor == null) {
+                runtime.monitor = new ConsoleMonitor(
+                        parseBoolean(runtime.properties.getOrDefault(DEBUG_PROPERTY, propertyOrEnv(DEBUG_PROPERTY, "false"))),
+                        parseBoolean(runtime.properties.getOrDefault(ANSI_PROPERTY, propertyOrEnv(ANSI_PROPERTY, "true")))
+                );
+            }
+
             return runtime;
         }
 
     }
 
+    private static class StoreMonitorSessionListener implements LauncherSessionListener {
+
+        private final Monitor monitor;
+
+        StoreMonitorSessionListener(Monitor monitor) {
+            this.monitor = monitor;
+        }
+
+        @Override
+        public void launcherSessionOpened(@NotNull LauncherSession session) {
+            session.getStore().put(Namespace.GLOBAL, Monitor.class.getName(), monitor);
+        }
+    }
 }

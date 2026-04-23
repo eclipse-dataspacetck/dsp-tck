@@ -21,10 +21,7 @@ dependencies {
     implementation(libs.tck.common.api)
     implementation(project(":core"))
     implementation(project(":dsp:dsp-api"))
-    testImplementation(project(":dsp:dsp-system"))
-}
 
-tasks.test {
-    systemProperty("dataspacetck.launcher", "org.eclipse.dataspacetck.dsp.system.DspSystemLauncher")
-    systemProperty("dataspacetck.dsp.local.connector", "true")
+    testImplementation(project(":dsp:dsp-system"))
+    testImplementation(project(":runtimes:tck-runtime"))
 }
