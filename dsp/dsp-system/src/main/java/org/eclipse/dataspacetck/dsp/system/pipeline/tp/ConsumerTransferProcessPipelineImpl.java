@@ -26,11 +26,11 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.BiFunction;
 
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.processJsonLd;
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.serialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_NAMESPACE;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.serialize;
 
 public class ConsumerTransferProcessPipelineImpl extends AbstractTransferProcessPipeline<ConsumerTransferProcessPipeline> implements ConsumerTransferProcessPipeline {
 

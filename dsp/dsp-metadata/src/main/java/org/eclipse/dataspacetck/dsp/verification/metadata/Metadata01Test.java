@@ -17,8 +17,8 @@ package org.eclipse.dataspacetck.dsp.verification.metadata;
 import org.eclipse.dataspacetck.api.system.MandatoryTest;
 import org.eclipse.dataspacetck.api.system.TestSequenceDiagram;
 import org.eclipse.dataspacetck.core.api.system.Inject;
-import org.eclipse.dataspacetck.core.api.verification.AbstractVerificationTest;
 import org.eclipse.dataspacetck.dsp.system.api.client.metadata.MetadataClient;
+import org.eclipse.dataspacetck.dsp.system.api.verification.AbstractVerificationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 

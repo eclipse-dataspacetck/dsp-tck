@@ -14,8 +14,5 @@
  */
 dependencies {
     api(project(":boot"))
-    implementation(libs.schema.validator) {
-        exclude("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml")
-    }
 }
 

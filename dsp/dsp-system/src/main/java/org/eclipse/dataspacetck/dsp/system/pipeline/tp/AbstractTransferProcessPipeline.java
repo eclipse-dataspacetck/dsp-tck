@@ -14,7 +14,6 @@
 
 package org.eclipse.dataspacetck.dsp.system.pipeline.tp;
 
-import org.eclipse.dataspacetck.core.api.pipeline.AbstractAsyncPipeline;
 import org.eclipse.dataspacetck.core.api.system.CallbackEndpoint;
 import org.eclipse.dataspacetck.core.spi.boot.Monitor;
 import org.eclipse.dataspacetck.dsp.system.api.http.FallibleDspHandler;
@@ -22,20 +21,21 @@ import org.eclipse.dataspacetck.dsp.system.api.pipeline.tp.TransferProcessPipeli
 import org.eclipse.dataspacetck.dsp.system.api.service.Result;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess;
 import org.eclipse.dataspacetck.dsp.system.client.tp.TransferProcessClient;
+import org.eclipse.dataspacetck.dsp.system.pipeline.AbstractDspPipeline;
 
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Function;
 
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.processJsonLd;
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.serialize;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.serialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createCompletion;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createStartRequest;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createSuspension;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createTermination;
 import static org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess.State;
 
-public abstract class AbstractTransferProcessPipeline<P extends TransferProcessPipeline<P>> extends AbstractAsyncPipeline<P> implements TransferProcessPipeline<P> {
+public abstract class AbstractTransferProcessPipeline<P extends TransferProcessPipeline<P>> extends AbstractDspPipeline<P> implements TransferProcessPipeline<P> {
     private static final String TRANSFER_START_PATH = "/transfers/[^/]+/start";
     private static final String TRANSFER_TERMINATION_PATH = "/transfers/[^/]+/termination";
     private static final String TRANSFER_COMPLETION_PATH = "/transfers/[^/]+/completion";

@@ -18,10 +18,10 @@ import org.eclipse.dataspacetck.api.system.MandatoryTest;
 import org.eclipse.dataspacetck.api.system.TestSequenceDiagram;
 import org.eclipse.dataspacetck.core.api.system.ConfigParam;
 import org.eclipse.dataspacetck.core.api.system.Inject;
-import org.eclipse.dataspacetck.core.api.verification.AbstractVerificationTest;
 import org.eclipse.dataspacetck.dsp.system.api.client.catalog.CatalogClient;
 import org.eclipse.dataspacetck.dsp.system.api.connector.Connector;
 import org.eclipse.dataspacetck.dsp.system.api.connector.Provider;
+import org.eclipse.dataspacetck.dsp.system.api.verification.AbstractVerificationTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -31,11 +31,11 @@ import java.util.Map;
 
 import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.registerValidator;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DcatConstants.DCAT_PROPERTY_DATASET_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_CATALOG_ERROR;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.ID;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.TYPE;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.registerValidator;
 import static org.eclipse.dataspacetck.dsp.system.api.message.catalog.CatalogFunctions.createCatalogRequest;
 import static org.eclipse.dataspacetck.dsp.system.api.message.catalog.CatalogFunctions.createDataset;
 

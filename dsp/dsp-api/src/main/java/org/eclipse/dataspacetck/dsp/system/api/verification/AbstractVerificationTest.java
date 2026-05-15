@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.dataspacetck.core.api.verification;
+package org.eclipse.dataspacetck.dsp.system.api.verification;
 
 import com.networknt.schema.Error;
 import com.networknt.schema.SchemaLocation;

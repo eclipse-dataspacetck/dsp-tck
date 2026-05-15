@@ -13,7 +13,6 @@
  */
 package org.eclipse.dataspacetck.dsp.system.pipeline;
 
-import org.eclipse.dataspacetck.core.api.pipeline.AbstractAsyncPipeline;
 import org.eclipse.dataspacetck.core.api.system.CallbackEndpoint;
 import org.eclipse.dataspacetck.core.spi.boot.Monitor;
 import org.eclipse.dataspacetck.dsp.system.api.pipeline.NegotiationPipeline;
@@ -25,14 +24,14 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Function;
 
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.processJsonLd;
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.serialize;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.serialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createTermination;
 
 /**
  * Base negotiation pipeline functionality.
  */
-public abstract class AbstractNegotiationPipeline<P extends NegotiationPipeline<P>> extends AbstractAsyncPipeline<P> implements NegotiationPipeline<P> {
+public abstract class AbstractNegotiationPipeline<P extends NegotiationPipeline<P>> extends AbstractDspPipeline<P> implements NegotiationPipeline<P> {
     private static final String NEGOTIATIONS_TERMINATION_PATH = "/negotiations/[^/]+/termination/";
     private final NegotiationClient negotiationClient;
     protected ContractNegotiation providerNegotiation;

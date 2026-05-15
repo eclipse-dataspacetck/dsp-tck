@@ -15,7 +15,6 @@
 package org.eclipse.dataspacetck.core.api.pipeline;
 
 import org.awaitility.core.ConditionTimeoutException;
-import org.eclipse.dataspacetck.core.api.message.MessageSerializer;
 import org.eclipse.dataspacetck.core.api.system.CallbackEndpoint;
 import org.eclipse.dataspacetck.core.spi.boot.Monitor;
 
@@ -23,10 +22,8 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
-import java.util.function.Consumer;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
@@ -102,20 +99,6 @@ public abstract class AbstractAsyncPipeline<P extends AsyncPipeline<P>> implemen
     public void execute() {
         stages.forEach(Runnable::run);
         stages.clear();
-    }
-
-    protected P addHandlerAction(String path, Consumer<Map<String, Object>> action) {
-        var latch = new CountDownLatch(1);
-        expectLatches.add(latch);
-        stages.add(() ->
-                endpoint.registerHandler(path, agreement -> {
-                    action.accept((MessageSerializer.processJsonLd(agreement)));
-                    endpoint.deregisterHandler(path);
-                    latch.countDown();
-                    return null;
-                }));
-        //noinspection unchecked
-        return (P) this;
     }
 
     protected void pause() {

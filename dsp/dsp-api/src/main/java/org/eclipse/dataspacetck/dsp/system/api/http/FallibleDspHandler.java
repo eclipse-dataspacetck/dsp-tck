@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.serialize;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.serialize;
 
 /**
  * A {@link ProtocolHandler} that can return a failure response.

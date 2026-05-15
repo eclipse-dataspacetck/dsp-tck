@@ -8,15 +8,4 @@
 # Each line is a file pattern followed by one or more contact persons. The last matching pattern has the most precedence.
 # For more details, read the following article on GitHub: https://help.github.com/articles/about-codeowners/.
 
-CONTRIBUTING.md @jimmarino @wolf4ood @paullatzelsperger
-LICENSE @jimmarino @wolf4ood @paullatzelsperger
-NOTICE.md @jimmarino @wolf4ood @paullatzelsperger
-
-.github/actions/ @paullatzelsperger
-.github/ISSUE_TEMPLATE @paullatzelsperger
-.github/workflows/ @paullatzelsperger
-
-/core/ @jimmarino @paullatzelsperger @wolf4ood
-/gradle/ @wolf4ood @paullatzelsperger
-/dsp/ @jimmarino
-/runtimes/ @jimmarino @wolf4ood @paullatzelsperger
+* @eclipse-dataspacetck/technology-dataspacetck-committers
