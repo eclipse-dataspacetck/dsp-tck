@@ -39,7 +39,7 @@ Submitting pull requests should be done while adhering to a couple of simple rul
 - Please complete reviews within two business days or delegate to another committer, removing yourself as a reviewer.
 - If you have been requested as reviewer, but cannot do the review for any reason (time, lack of knowledge in particular
   area, etc.) please comment that in the PR and remove yourself as a reviewer, suggesting a stand-in. The [code
-  owners document](CODEOWNERS) should help with that.
+  owners document](.github/CODEOWNERS) should help with that.
 - Don't be overly pedantic.
 - Don't argue basic principles (code style, architectural decisions, etc.)
 - Use the `suggestion` feature of GitHub for small/simple changes.

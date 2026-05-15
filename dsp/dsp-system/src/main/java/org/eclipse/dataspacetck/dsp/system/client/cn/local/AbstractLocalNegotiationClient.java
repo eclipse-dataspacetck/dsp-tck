@@ -17,7 +17,7 @@ package org.eclipse.dataspacetck.dsp.system.client.cn.local;
 import java.util.Map;
 import java.util.function.Function;
 
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
 
 /**
  * Base negotiation local client functionality.

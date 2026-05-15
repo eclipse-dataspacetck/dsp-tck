@@ -28,13 +28,13 @@ import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.processJsonLd;
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.serialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_NAMESPACE;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_PROVIDER_PID_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.TCK_PARTICIPANT_ID;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.serialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createAcceptedEvent;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createContractRequest;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createCounterOffer;

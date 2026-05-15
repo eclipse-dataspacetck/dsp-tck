@@ -22,7 +22,6 @@ import org.eclipse.dataspacetck.dsp.system.client.cn.ProviderNegotiationClient;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.processJsonLd;
 import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.getJson;
 import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.postJson;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_PROVIDER_PID;
@@ -30,6 +29,7 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPAC
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.compactStringProperty;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
 
 /**
  * Implementation of a {@link ProviderNegotiationClient} that supports dispatch to a remote connector system via HTTP.

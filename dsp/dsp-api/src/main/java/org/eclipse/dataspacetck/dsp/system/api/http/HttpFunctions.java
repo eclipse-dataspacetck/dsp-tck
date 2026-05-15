@@ -24,8 +24,8 @@ import okhttp3.Response;
 
 import java.io.IOException;
 
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.serialize;
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.serializePlainJson;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.serialize;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.serializePlainJson;
 
 /**
  * Utility methods for HTTP requests.

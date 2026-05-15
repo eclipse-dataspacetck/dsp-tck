@@ -19,7 +19,7 @@ import org.eclipse.dataspacetck.dsp.system.client.cn.ProviderNegotiationClient;
 
 import java.util.Map;
 
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createNegotiationResponse;
 
 /**

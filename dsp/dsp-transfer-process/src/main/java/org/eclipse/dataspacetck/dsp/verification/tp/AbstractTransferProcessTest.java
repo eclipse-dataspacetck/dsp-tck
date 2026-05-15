@@ -14,10 +14,10 @@
 
 package org.eclipse.dataspacetck.dsp.verification.tp;
 
-import org.eclipse.dataspacetck.core.api.verification.AbstractVerificationTest;
+import org.eclipse.dataspacetck.dsp.system.api.verification.AbstractVerificationTest;
 import org.junit.jupiter.api.BeforeAll;
 
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.registerValidator;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.registerValidator;
 
 public class AbstractTransferProcessTest extends AbstractVerificationTest {
 

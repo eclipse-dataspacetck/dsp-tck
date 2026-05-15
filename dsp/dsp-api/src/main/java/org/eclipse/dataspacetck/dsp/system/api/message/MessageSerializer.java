@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.dataspacetck.core.api.message;
+package org.eclipse.dataspacetck.dsp.system.api.message;
 
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdOptions;
@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsonp.JSONPModule;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import org.eclipse.dataspacetck.core.api.message.MessageValidator;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

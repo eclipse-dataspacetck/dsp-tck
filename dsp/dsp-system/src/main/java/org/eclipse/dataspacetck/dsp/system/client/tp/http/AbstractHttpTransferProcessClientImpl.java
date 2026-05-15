@@ -20,12 +20,12 @@ import org.eclipse.dataspacetck.dsp.system.client.tp.TransferProcessClient;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.processJsonLd;
 import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.getJson;
 import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.postJson;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_PROVIDER_PID_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
 
 /**
  * Base Proxy methods to the  connector being verified for transfer process.

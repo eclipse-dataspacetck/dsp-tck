@@ -19,7 +19,7 @@ import org.eclipse.dataspacetck.dsp.system.api.connector.Connector;
 
 import java.util.Map;
 
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
 import static org.eclipse.dataspacetck.dsp.system.api.message.catalog.CatalogFunctions.createCatalogErrorResponse;
 import static org.eclipse.dataspacetck.dsp.system.api.message.catalog.CatalogFunctions.createCatalogResponse;
 import static org.eclipse.dataspacetck.dsp.system.api.message.catalog.CatalogFunctions.createDatasetResponse;

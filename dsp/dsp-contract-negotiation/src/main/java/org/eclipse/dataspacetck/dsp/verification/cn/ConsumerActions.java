@@ -18,10 +18,10 @@ import okhttp3.Response;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation;
 
 import static java.lang.String.format;
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.processJsonLd;
 import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.postJson;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_PROVIDER_PID_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createAcceptedEvent;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createContractRequest;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createTermination;

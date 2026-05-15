@@ -19,8 +19,8 @@ import org.eclipse.dataspacetck.dsp.system.api.client.metadata.MetadataClient;
 
 import java.util.Map;
 
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.processJson;
 import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.getJson;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJson;
 
 public class HttpMetadataClient implements MetadataClient {
     private static final String METADATA_REQUEST_PATH = "/.well-known/dspace-version";

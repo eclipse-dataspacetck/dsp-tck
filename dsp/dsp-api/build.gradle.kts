@@ -15,4 +15,7 @@
 
 dependencies {
     implementation(project(":core"))
+    implementation(libs.schema.validator) {
+        exclude("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml")
+    }
 }

@@ -20,9 +20,9 @@ import org.eclipse.dataspacetck.dsp.system.api.client.catalog.CatalogClient;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static org.eclipse.dataspacetck.core.api.message.MessageSerializer.processJsonLd;
 import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.getJson;
 import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.postJson;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
 
 /**
  * HTTP client for the catalog.
