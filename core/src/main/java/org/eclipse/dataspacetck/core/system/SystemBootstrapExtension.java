@@ -253,7 +253,12 @@ public class SystemBootstrapExtension implements BeforeAllCallback,
                     return;
                 }
             }
-            exchange.sendResponseHeaders(404, 0);
+
+            var message = "No handler registered on this endpoint".getBytes();
+            exchange.sendResponseHeaders(404, message.length);
+            var responseBody = exchange.getResponseBody();
+            responseBody.write(message);
+            responseBody.close();
             exchange.close();
         }
     }
