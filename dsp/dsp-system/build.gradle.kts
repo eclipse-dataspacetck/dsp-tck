@@ -15,5 +15,5 @@
 
 dependencies {
     api(project(":dsp:dsp-api"))
-    implementation(project(":core"))
+    implementation(libs.tck.core)
 }

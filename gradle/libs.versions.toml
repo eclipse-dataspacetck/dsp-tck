@@ -19,6 +19,9 @@ schema-validator = "2.0.1"
 
 # modules from tck-common
 tck-common-api = { module = "org.eclipse.dataspacetck.common:core-api", version.ref = "tck" }
+tck-boot = { module = "org.eclipse.dataspacetck.common:boot", version.ref = "tck" }
+tck-core = { module = "org.eclipse.dataspacetck.common:core", version.ref = "tck" }
+tck-runtime = { module = "org.eclipse.dataspacetck.common:tck-runtime", version.ref = "tck" }
 
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 awaitility = { module = "org.awaitility:awaitility", version.ref = "awaitility" }
