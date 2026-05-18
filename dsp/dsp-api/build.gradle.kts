@@ -14,7 +14,7 @@
  */
 
 dependencies {
-    implementation(project(":core"))
+    implementation(libs.tck.core)
     implementation(libs.schema.validator) {
         exclude("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml")
     }

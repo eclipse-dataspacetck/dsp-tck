@@ -18,10 +18,10 @@ plugins {
 
 dependencies {
     implementation(libs.tck.common.api)
-    implementation(project(":core"))
+    implementation(libs.tck.core)
     implementation(project(":dsp:dsp-api"))
     implementation(libs.assertj)
 
     testImplementation(project(":dsp:dsp-system"))
-    testImplementation(project(":runtimes:tck-runtime"))
+    testImplementation(libs.tck.runtime)
 }
