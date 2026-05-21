@@ -11,7 +11,7 @@ parsson = "1.1.7"
 jupiter = "6.1.0"
 okhttp = "5.3.0"
 mockito = "5.23.0"
-tck = "main"
+tck = "1.0.0"
 titanium = "1.7.0"
 schema-validator = "2.0.1"
 
@@ -19,7 +19,6 @@ schema-validator = "2.0.1"
 
 # modules from tck-common
 tck-common-api = { module = "org.eclipse.dataspacetck.common:core-api", version.ref = "tck" }
-tck-boot = { module = "org.eclipse.dataspacetck.common:boot", version.ref = "tck" }
 tck-core = { module = "org.eclipse.dataspacetck.common:core", version.ref = "tck" }
 tck-runtime = { module = "org.eclipse.dataspacetck.common:tck-runtime", version.ref = "tck" }
 
