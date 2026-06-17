@@ -29,14 +29,15 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.tck.core)
-    implementation(project(":dsp:dsp-api"))
-    implementation(project(":dsp:dsp-system"))
-    implementation(project(":dsp:dsp-contract-negotiation"))
-    implementation(project(":dsp:dsp-transfer-process"))
-    implementation(project(":dsp:dsp-catalog"))
-    implementation(project(":dsp:dsp-metadata"))
-    implementation(libs.tck.runtime)
+    api(libs.tck.core)
+    api(project(":dsp:dsp-api"))
+    api(project(":dsp:dsp-system"))
+    api(project(":dsp:dsp-contract-negotiation"))
+    api(project(":dsp:dsp-transfer-process"))
+    api(project(":dsp:dsp-catalog"))
+    api(project(":dsp:dsp-metadata"))
+    api(libs.tck.runtime)
+
     implementation(libs.junit.platform.launcher)
     testImplementation(project(":dsp:dsp-contract-negotiation"))
     testImplementation(project(":dsp:dsp-transfer-process"))
