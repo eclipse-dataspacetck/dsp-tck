@@ -1,3 +1,4 @@
+import org.eclipse.dataspacetck.gradle.plugins.tckgen.TckGeneratorExtension
 import org.eclipse.dataspacetck.gradle.tckbuild.extensions.TckBuildExtension
 
 /*
@@ -24,17 +25,11 @@ plugins {
     `jacoco-report-aggregation`
     alias(libs.plugins.docker)
     alias(libs.plugins.nexuspublishing)
-    alias(libs.plugins.tck.build)
+    alias(libs.plugins.tck.build) apply false
+    alias(libs.plugins.tck.generator) apply false
 }
 
-buildscript {
-    dependencies {
-        val version: String by project
-        classpath("org.eclipse.dataspacetck.build.tck-build:org.eclipse.dataspacetck.build.tck-build.gradle.plugin:$version")
-        classpath("org.eclipse.dataspacetck.build.tck-generator:org.eclipse.dataspacetck.build.tck-generator.gradle.plugin:$version")
-    }
-}
-
+val tckVersion = libs.versions.tck.get()
 
 allprojects {
 
@@ -49,11 +44,14 @@ allprojects {
         pom {
             scmConnection = "https://github.com/eclipse-dataspacetck/dsp-tck.git"
             scmUrl = "scm:git:git@github.com:eclipse-dataspacetck/dsp-tck.git"
-            groupId = project.group.toString()
             projectName = project.name
             description = "DSP Technology Compatibility Kit"
             projectUrl = "https://projects.eclipse.org/projects/technology.dataspacetck"
         }
+    }
+
+    configure<TckGeneratorExtension> {
+        generatorVersion = tckVersion
     }
 
     tasks.test {
