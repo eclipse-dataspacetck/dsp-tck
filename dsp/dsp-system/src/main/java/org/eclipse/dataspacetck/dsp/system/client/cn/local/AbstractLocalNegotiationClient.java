@@ -17,7 +17,7 @@ package org.eclipse.dataspacetck.dsp.system.client.cn.local;
 import java.util.Map;
 import java.util.function.Function;
 
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.expandAndDeserialize;
 
 /**
  * Base negotiation local client functionality.
@@ -27,7 +27,7 @@ public abstract class AbstractLocalNegotiationClient {
 
     protected <T> T execute(String operation, Map<String, Object> payload, boolean expectError, Function<Map<String, Object>, T> work) {
         try {
-            var compacted = processJsonLd(payload);
+            var compacted = expandAndDeserialize(payload);
             var result = work.apply(compacted);
             if (expectError) {
                 throw new AssertionError("Expected to throw an error on %s".formatted(operation));

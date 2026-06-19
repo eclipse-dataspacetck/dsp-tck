@@ -22,7 +22,7 @@ import java.util.Map;
 import static java.lang.String.format;
 import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.getJson;
 import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.postJson;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.expandAndDeserialize;
 
 /**
  * HTTP client for the catalog.
@@ -43,8 +43,7 @@ public class HttpCatalogClient implements CatalogClient {
     public Map<String, Object> getCatalog(Map<String, Object> message) {
         try (var response = postJson(connectorUnderTestUrl + CATALOG_REQUEST_PATH, message, false)) {
             monitor.debug("Received catalog request response");
-            //noinspection DataFlowIssue
-            return processJsonLd(response.body().byteStream());
+            return expandAndDeserialize(response.body().byteStream());
         }
     }
 
@@ -52,8 +51,7 @@ public class HttpCatalogClient implements CatalogClient {
     public Map<String, Object> getDataset(String datasetId, boolean expectError) {
         try (var response = getJson(connectorUnderTestUrl + format(DATASET_REQUEST_PATH, datasetId), expectError)) {
             monitor.debug("Received dataset request response");
-            //noinspection DataFlowIssue
-            return processJsonLd(response.body().byteStream());
+            return expandAndDeserialize(response.body().byteStream());
         }
     }
 }

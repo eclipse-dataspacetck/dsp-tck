@@ -15,6 +15,7 @@ package org.eclipse.dataspacetck.dsp.system.pipeline;
 
 import org.eclipse.dataspacetck.core.api.system.CallbackEndpoint;
 import org.eclipse.dataspacetck.core.spi.boot.Monitor;
+import org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer;
 import org.eclipse.dataspacetck.dsp.system.api.pipeline.NegotiationPipeline;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation;
 import org.eclipse.dataspacetck.dsp.system.client.cn.NegotiationClient;
@@ -24,7 +25,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Function;
 
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.expandAndDeserialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.serialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createTermination;
 
@@ -56,11 +57,11 @@ public abstract class AbstractNegotiationPipeline<P extends NegotiationPipeline<
         expectLatches.add(latch);
         stages.add(() ->
                 endpoint.registerHandler(path, event -> {
-                    var expanded = processJsonLd(event);
+                    var expanded = MessageSerializer.expandAndDeserialize(event);
                     var response = action.apply(expanded);
                     endpoint.deregisterHandler(path);
                     latch.countDown();
-                    return serialize(processJsonLd(response));
+                    return serialize(expandAndDeserialize(response));
                 }));
         return self();
     }

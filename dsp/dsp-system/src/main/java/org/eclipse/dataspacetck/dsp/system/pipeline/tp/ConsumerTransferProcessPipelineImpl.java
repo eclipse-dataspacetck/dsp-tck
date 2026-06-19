@@ -18,6 +18,7 @@ import org.eclipse.dataspacetck.core.api.system.CallbackEndpoint;
 import org.eclipse.dataspacetck.core.spi.boot.Monitor;
 import org.eclipse.dataspacetck.dsp.system.api.connector.Connector;
 import org.eclipse.dataspacetck.dsp.system.api.connector.tp.TransferProcessListener;
+import org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer;
 import org.eclipse.dataspacetck.dsp.system.api.pipeline.tp.ConsumerTransferProcessPipeline;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess;
 import org.eclipse.dataspacetck.dsp.system.client.tp.ConsumerTransferProcessClient;
@@ -29,7 +30,7 @@ import java.util.function.BiFunction;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_NAMESPACE;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.expandAndDeserialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.serialize;
 
 public class ConsumerTransferProcessPipelineImpl extends AbstractTransferProcessPipeline<ConsumerTransferProcessPipeline> implements ConsumerTransferProcessPipeline {
@@ -77,11 +78,11 @@ public class ConsumerTransferProcessPipelineImpl extends AbstractTransferProcess
         expectLatches.add(latch);
         stages.add(() ->
                 endpoint.registerHandler(REQUEST_PATH, event -> {
-                    var expanded = processJsonLd(event);
+                    var expanded = MessageSerializer.expandAndDeserialize(event);
                     var negotiation = action.apply(expanded, consumerConnectorId);
                     endpoint.deregisterHandler(REQUEST_PATH);
                     latch.countDown();
-                    return serialize(processJsonLd(negotiation));
+                    return serialize(expandAndDeserialize(negotiation));
                 }));
         return this;
     }

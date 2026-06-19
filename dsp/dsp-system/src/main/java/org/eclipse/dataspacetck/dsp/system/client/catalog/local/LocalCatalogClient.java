@@ -19,7 +19,7 @@ import org.eclipse.dataspacetck.dsp.system.api.connector.Connector;
 
 import java.util.Map;
 
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.expandAndDeserialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.catalog.CatalogFunctions.createCatalogErrorResponse;
 import static org.eclipse.dataspacetck.dsp.system.api.message.catalog.CatalogFunctions.createCatalogResponse;
 import static org.eclipse.dataspacetck.dsp.system.api.message.catalog.CatalogFunctions.createDatasetResponse;
@@ -38,16 +38,16 @@ public class LocalCatalogClient implements CatalogClient {
     @Override
     public Map<String, Object> getCatalog(Map<String, Object> message) {
         var catalog = connector.getCatalogManager().getCatalog();
-        return processJsonLd(createCatalogResponse(catalog));
+        return expandAndDeserialize(createCatalogResponse(catalog));
     }
 
     @Override
     public Map<String, Object> getDataset(String datasetId, boolean expectError) {
         var dataset = connector.getCatalogManager().getDataset(datasetId);
         if (dataset != null && !expectError) {
-            return processJsonLd(createDatasetResponse(dataset));
+            return expandAndDeserialize(createDatasetResponse(dataset));
 
         }
-        return processJsonLd(createCatalogErrorResponse("401"));
+        return expandAndDeserialize(createCatalogErrorResponse("401"));
     }
 }

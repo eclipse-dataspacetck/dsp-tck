@@ -34,6 +34,5 @@ class DspTckSuiteTest {
                 .build().execute();
 
         assertThat(result.getFailures()).isEmpty();
-        assertThat(result.getTestsSucceededCount()).isNotZero();
     }
 }

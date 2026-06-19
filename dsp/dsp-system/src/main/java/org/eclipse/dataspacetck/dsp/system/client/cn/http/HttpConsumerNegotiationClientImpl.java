@@ -26,7 +26,7 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPAC
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.TCK_PARTICIPANT_ID;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.expandAndDeserialize;
 
 /**
  * Implementation of a {@link ConsumerNegotiationClient} that supports dispatch to a remote connector system via HTTP.
@@ -90,8 +90,7 @@ public class HttpConsumerNegotiationClientImpl extends AbstractHttpNegotiationCl
     @Override
     public Map<String, Object> getNegotiation(String consumerId, String callbackAddress) {
         try (var response = getJson(format(GET_PATH, callbackAddress, consumerId))) {
-            //noinspection DataFlowIssue
-            var jsonResponse = processJsonLd(response.body().byteStream());
+            var jsonResponse = expandAndDeserialize(response.body().byteStream());
             var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, jsonResponse);
             var state = stringIdProperty(DSPACE_PROPERTY_STATE_EXPANDED, jsonResponse);
             monitor.debug(format("Received negotiation status response with state %s: %s", state, providerId));

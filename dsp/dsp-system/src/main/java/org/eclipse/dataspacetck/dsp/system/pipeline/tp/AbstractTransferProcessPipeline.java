@@ -17,6 +17,7 @@ package org.eclipse.dataspacetck.dsp.system.pipeline.tp;
 import org.eclipse.dataspacetck.core.api.system.CallbackEndpoint;
 import org.eclipse.dataspacetck.core.spi.boot.Monitor;
 import org.eclipse.dataspacetck.dsp.system.api.http.FallibleDspHandler;
+import org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer;
 import org.eclipse.dataspacetck.dsp.system.api.pipeline.tp.TransferProcessPipeline;
 import org.eclipse.dataspacetck.dsp.system.api.service.Result;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.TransferProcess;
@@ -27,7 +28,6 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Function;
 
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.serialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createCompletion;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createStartRequest;
@@ -129,7 +129,7 @@ public abstract class AbstractTransferProcessPipeline<P extends TransferProcessP
         expectLatches.add(latch);
         stages.add(() ->
                 endpoint.registerProtocolHandler(TRANSFER_START_PATH, new FallibleDspHandler(msg -> {
-                    var result = action.apply((processJsonLd(msg)));
+                    var result = action.apply((MessageSerializer.expandAndDeserialize(msg)));
                     endpoint.deregisterHandler(TRANSFER_START_PATH);
                     latch.countDown();
                     return result;
@@ -143,7 +143,7 @@ public abstract class AbstractTransferProcessPipeline<P extends TransferProcessP
         expectLatches.add(latch);
         stages.add(() ->
                 endpoint.registerHandler(TRANSFER_TERMINATION_PATH, offer -> {
-                    var transfer = action.apply((processJsonLd(offer)));
+                    var transfer = action.apply((MessageSerializer.expandAndDeserialize(offer)));
                     endpoint.deregisterHandler(TRANSFER_TERMINATION_PATH);
                     latch.countDown();
                     return serialize(transfer);
@@ -158,7 +158,7 @@ public abstract class AbstractTransferProcessPipeline<P extends TransferProcessP
         expectLatches.add(latch);
         stages.add(() ->
                 endpoint.registerProtocolHandler(TRANSFER_COMPLETION_PATH, new FallibleDspHandler(offer -> {
-                    var result = action.apply((processJsonLd(offer)));
+                    var result = action.apply((MessageSerializer.expandAndDeserialize(offer)));
                     endpoint.deregisterHandler(TRANSFER_COMPLETION_PATH);
                     latch.countDown();
                     return result;
@@ -173,7 +173,7 @@ public abstract class AbstractTransferProcessPipeline<P extends TransferProcessP
         expectLatches.add(latch);
         stages.add(() ->
                 endpoint.registerProtocolHandler(TRANSFER_SUSPENSION_PATH, new FallibleDspHandler(offer -> {
-                    var result = action.apply((processJsonLd(offer)));
+                    var result = action.apply((MessageSerializer.expandAndDeserialize(offer)));
                     endpoint.deregisterHandler(TRANSFER_SUSPENSION_PATH);
                     latch.countDown();
                     return result;

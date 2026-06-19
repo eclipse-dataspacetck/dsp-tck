@@ -20,7 +20,7 @@ import org.eclipse.dataspacetck.dsp.system.client.tp.ProviderTransferProcessClie
 import java.util.Map;
 
 import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.postJson;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.expandAndDeserialize;
 
 /**
  * Implementation of {@link ProviderTransferProcessClient} when running with remote connector
@@ -41,8 +41,7 @@ public class HttpProviderTransferProcessClient extends AbstractHttpTransferProce
     public Map<String, Object> transferRequest(Map<String, Object> transferRequest, String counterPartyId, boolean expectError) {
         try (var response = postJson(connectorUnderTestUrl + REQUEST_PATH, transferRequest, expectError)) {
             monitor.debug("Received transfer request response");
-            //noinspection DataFlowIssue
-            return processJsonLd(response.body().byteStream());
+            return expandAndDeserialize(response.body().byteStream());
         }
     }
 

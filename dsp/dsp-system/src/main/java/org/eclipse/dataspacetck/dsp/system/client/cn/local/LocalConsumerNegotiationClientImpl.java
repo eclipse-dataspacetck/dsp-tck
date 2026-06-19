@@ -19,7 +19,7 @@ import org.eclipse.dataspacetck.dsp.system.client.cn.ConsumerNegotiationClient;
 
 import java.util.Map;
 
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.expandAndDeserialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createNegotiationResponse;
 
 /**
@@ -66,7 +66,7 @@ public class LocalConsumerNegotiationClientImpl extends AbstractLocalNegotiation
     public Map<String, Object> getNegotiation(String consumerId, String callbackAddress) {
         var negotiation = systemConsumerConnector.getConsumerNegotiationManager().findById(consumerId);
         var consumerPid = negotiation.getCorrelationId();
-        return processJsonLd(createNegotiationResponse(consumerId, consumerPid, negotiation.getState().toString()));
+        return expandAndDeserialize(createNegotiationResponse(consumerId, consumerPid, negotiation.getState().toString()));
     }
 
     @Override

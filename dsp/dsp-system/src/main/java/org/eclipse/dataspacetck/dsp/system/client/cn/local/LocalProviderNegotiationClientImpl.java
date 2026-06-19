@@ -19,7 +19,7 @@ import org.eclipse.dataspacetck.dsp.system.client.cn.ProviderNegotiationClient;
 
 import java.util.Map;
 
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.expandAndDeserialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createNegotiationResponse;
 
 /**
@@ -36,7 +36,7 @@ public class LocalProviderNegotiationClientImpl extends AbstractLocalNegotiation
     public Map<String, Object> contractRequest(Map<String, Object> contractRequest, String counterPartyId, boolean expectError) {
         return execute("contractRequest", contractRequest, expectError, (compacted) -> {
             var negotiation = systemConnector.getProviderNegotiationManager().handleContractRequest(compacted, counterPartyId);
-            return processJsonLd(negotiation);
+            return expandAndDeserialize(negotiation);
         });
     }
 
@@ -47,7 +47,7 @@ public class LocalProviderNegotiationClientImpl extends AbstractLocalNegotiation
 
     @Override
     public void accept(Map<String, Object> event) {
-        var compacted = processJsonLd(event);
+        var compacted = expandAndDeserialize(event);
         systemConnector.getProviderNegotiationManager().handleAccepted(compacted);
     }
 
@@ -71,7 +71,7 @@ public class LocalProviderNegotiationClientImpl extends AbstractLocalNegotiation
     public Map<String, Object> getNegotiation(String providerPid) {
         var negotiation = systemConnector.getProviderNegotiationManager().findById(providerPid);
         var consumerPid = negotiation.getCorrelationId();
-        return processJsonLd(createNegotiationResponse(providerPid, consumerPid, negotiation.getState().toString()));
+        return expandAndDeserialize(createNegotiationResponse(providerPid, consumerPid, negotiation.getState().toString()));
     }
 
 }

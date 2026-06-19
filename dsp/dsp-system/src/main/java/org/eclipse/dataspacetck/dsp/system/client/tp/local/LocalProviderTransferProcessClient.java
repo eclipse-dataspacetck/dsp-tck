@@ -19,7 +19,7 @@ import org.eclipse.dataspacetck.dsp.system.client.tp.ProviderTransferProcessClie
 
 import java.util.Map;
 
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.expandAndDeserialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createTransferResponse;
 
 /**
@@ -36,12 +36,12 @@ public class LocalProviderTransferProcessClient implements ProviderTransferProce
     @Override
     public Map<String, Object> transferRequest(Map<String, Object> transferRequest, String counterPartyId, boolean expectError) {
         try {
-            var compacted = processJsonLd(transferRequest);
+            var compacted = expandAndDeserialize(transferRequest);
             var transferProcess = systemConnector.getProviderTransferProcessManager().handleTransferRequest(compacted, counterPartyId);
             if (expectError) {
                 throw new AssertionError("Expected to throw an error on transfer request");
             }
-            return processJsonLd(transferProcess);
+            return expandAndDeserialize(transferProcess);
         } catch (IllegalStateException e) {
             // if the error is expected, swallow exception
             if (!expectError) {
@@ -54,27 +54,27 @@ public class LocalProviderTransferProcessClient implements ProviderTransferProce
 
     @Override
     public void terminateTransfer(String counterPartyPid, Map<String, Object> terminationMessage, String callbackAddress, boolean expectError) {
-        systemConnector.getProviderTransferProcessManager().handleTermination(processJsonLd(terminationMessage));
+        systemConnector.getProviderTransferProcessManager().handleTermination(expandAndDeserialize(terminationMessage));
     }
 
     @Override
     public void completeTransfer(String counterPartyPid, Map<String, Object> completionMessage, String callbackAddress, boolean expectError) {
-        systemConnector.getProviderTransferProcessManager().handleCompletion(processJsonLd(completionMessage));
+        systemConnector.getProviderTransferProcessManager().handleCompletion(expandAndDeserialize(completionMessage));
     }
 
     @Override
     public void suspendTransfer(String counterPartyPid, Map<String, Object> suspensionMessage, String callbackAddress, boolean expectError) {
-        systemConnector.getProviderTransferProcessManager().handleSuspension(processJsonLd(suspensionMessage));
+        systemConnector.getProviderTransferProcessManager().handleSuspension(expandAndDeserialize(suspensionMessage));
     }
 
     @Override
     public void startTransfer(String counterPartiPid, Map<String, Object> startMessage, String callbackAddress, boolean expectError) {
-        systemConnector.getProviderTransferProcessManager().handleStart(processJsonLd(startMessage));
+        systemConnector.getProviderTransferProcessManager().handleStart(expandAndDeserialize(startMessage));
     }
 
     @Override
     public Map<String, Object> getTransferProcess(String counterPartyPid, String callbackAddress) {
         var tp = systemConnector.getProviderTransferProcessManager().findById(counterPartyPid);
-        return processJsonLd(createTransferResponse(tp.providerPid(), tp.consumerPid(), tp.getState().toString()));
+        return expandAndDeserialize(createTransferResponse(tp.providerPid(), tp.consumerPid(), tp.getState().toString()));
     }
 }

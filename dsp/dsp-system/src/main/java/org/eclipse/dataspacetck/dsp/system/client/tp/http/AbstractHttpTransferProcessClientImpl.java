@@ -15,6 +15,7 @@
 package org.eclipse.dataspacetck.dsp.system.client.tp.http;
 
 import org.eclipse.dataspacetck.core.spi.boot.Monitor;
+import org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer;
 import org.eclipse.dataspacetck.dsp.system.client.tp.TransferProcessClient;
 
 import java.util.Map;
@@ -25,7 +26,6 @@ import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.postJso
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_PROVIDER_PID_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
 
 /**
  * Base Proxy methods to the  connector being verified for transfer process.
@@ -75,7 +75,7 @@ public abstract class AbstractHttpTransferProcessClientImpl implements TransferP
     public Map<String, Object> getTransferProcess(String counterPartyPid, String callbackAddress) {
         try (var response = getJson(callbackAddress + format(GET_PATH, counterPartyPid))) {
             //noinspection DataFlowIssue
-            var jsonResponse = processJsonLd(response.body().byteStream());
+            var jsonResponse = MessageSerializer.expandAndDeserialize(response.body().byteStream());
             var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, jsonResponse);
             var state = stringIdProperty(DSPACE_PROPERTY_STATE_EXPANDED, jsonResponse);
             monitor.debug(format("Received transfer status response with state %s: %s", state, providerId));
