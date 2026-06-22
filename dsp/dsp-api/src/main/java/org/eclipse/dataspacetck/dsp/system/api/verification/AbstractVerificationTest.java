@@ -16,6 +16,7 @@
 package org.eclipse.dataspacetck.dsp.system.api.verification;
 
 import com.networknt.schema.Error;
+import com.networknt.schema.InputFormat;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.SchemaRegistry;
 import com.networknt.schema.dialect.Dialects;
@@ -46,7 +47,7 @@ public abstract class AbstractVerificationTest {
         return (input) -> {
             var schemaValidator = SCHEMA_FACTORY.getSchema(SchemaLocation.of(DSPACE_NAMESPACE + schema));
 
-            var response = schemaValidator.validate(input);
+            var response = schemaValidator.validate(input.toString(), InputFormat.JSON);
             if (response.isEmpty()) {
                 return List.of();
             }
