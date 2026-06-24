@@ -29,7 +29,7 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPAC
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.compactStringProperty;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.expandAndDeserialize;
 
 /**
  * Implementation of a {@link ProviderNegotiationClient} that supports dispatch to a remote connector system via HTTP.
@@ -55,8 +55,7 @@ public class HttpProviderNegotiationClientImpl extends AbstractHttpNegotiationCl
     public Map<String, Object> contractRequest(Map<String, Object> contractRequest, String counterPartyId, boolean expectError) {
         try (var response = postJson(providerConnectorBaseUrl + REQUEST_PATH, contractRequest, expectError)) {
             monitor.debug("Received contract request response");
-            //noinspection DataFlowIssue
-            return processJsonLd(response.body().byteStream());
+            return expandAndDeserialize(response.body().byteStream());
         }
     }
 
@@ -92,7 +91,7 @@ public class HttpProviderNegotiationClientImpl extends AbstractHttpNegotiationCl
     public Map<String, Object> getNegotiation(String providerPid) {
         try (var response = getJson(providerConnectorBaseUrl + format(GET_PATH, providerPid))) {
             //noinspection DataFlowIssue
-            var jsonResponse = processJsonLd(response.body().byteStream());
+            var jsonResponse = expandAndDeserialize(response.body().byteStream());
             var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, jsonResponse);
             var state = stringIdProperty(DSPACE_PROPERTY_STATE_EXPANDED, jsonResponse);
             monitor.debug(format("Received negotiation status response with state %s: %s", state, providerId));

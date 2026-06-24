@@ -107,31 +107,26 @@ public class MessageSerializer {
         }
     }
 
-    public static Map<String, Object> processJsonLd(InputStream stream) {
+    @SuppressWarnings("unchecked")
+    public static <T> T deserialize(InputStream stream, Class<T> type) {
         try {
-            return processJsonLd(MAPPER.readValue(stream, JsonObject.class));
+            return MAPPER.readValue(stream, type);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new AssertionError("Cannot deserialize json: " + e.getMessage(), e);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public static Map<String, Object> processJson(InputStream stream) {
-        try {
-            return MAPPER.readValue(stream, Map.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public static Map<String, Object> expandAndDeserialize(InputStream stream) {
+        return expandAndDeserialize(deserialize(stream, JsonObject.class));
     }
 
-    public static Map<String, Object> processJsonLd(Map<String, Object> message) {
-        return processJsonLd(MAPPER.convertValue(message, JsonObject.class));
+    public static Map<String, Object> expandAndDeserialize(Map<String, Object> message) {
+        return expandAndDeserialize(Json.createObjectBuilder(message).build());
     }
 
     @SuppressWarnings("unchecked")
-    private static Map<String, Object> processJsonLd(JsonObject document) {
+    private static Map<String, Object> expandAndDeserialize(JsonObject document) {
         try {
-
             validateMessage(document);
 
             var options = new JsonLdOptions((uri, documentLoaderOptions) -> CONTEXTS.get(uri));
@@ -142,11 +137,15 @@ public class MessageSerializer {
             var expanded = jsonArray.get(0);
             return MAPPER.convertValue(expanded, Map.class);
         } catch (JsonLdError e) {
-            throw new RuntimeException(e);
+            throw new AssertionError("Cannot expand json-ld document: " + e.getMessage(), e);
         }
     }
 
     private static void validateMessage(JsonObject document) {
+        if (!document.containsKey(TYPE)) {
+            throw new AssertionError("Invalid JsonLd Document, expecting a @type attribute");
+        }
+
         var result = Optional.of(document.getString(TYPE))
                 .map(VALIDATORS::get)
                 .map(validator -> validator.validate(MAPPER.convertValue(document, JsonNode.class)))

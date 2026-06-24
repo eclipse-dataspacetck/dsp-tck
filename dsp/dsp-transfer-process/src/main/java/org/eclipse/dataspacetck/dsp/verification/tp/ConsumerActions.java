@@ -21,7 +21,7 @@ import static java.lang.String.format;
 import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.postJson;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_PROVIDER_PID_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.expandAndDeserialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createCompletion;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createStartRequest;
 import static org.eclipse.dataspacetck.dsp.system.api.message.tp.TransferFunctions.createTermination;
@@ -47,8 +47,7 @@ public class ConsumerActions {
         try (var response = postJson(url, transferRequest)) {
             // get the response and update the negotiation with the provider process id
             checkResponse(response);
-            assert response.body() != null;
-            var jsonResponse = processJsonLd(response.body().byteStream());
+            var jsonResponse = expandAndDeserialize(response.body().byteStream());
             var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, jsonResponse);
             transferProcess.setCorrelationId(providerId);
             transferProcess.transition(REQUESTED);

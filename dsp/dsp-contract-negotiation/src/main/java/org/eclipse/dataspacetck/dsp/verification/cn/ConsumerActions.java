@@ -15,13 +15,13 @@
 package org.eclipse.dataspacetck.dsp.verification.cn;
 
 import okhttp3.Response;
+import org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation;
 
 import static java.lang.String.format;
 import static org.eclipse.dataspacetck.dsp.system.api.http.HttpFunctions.postJson;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_PROVIDER_PID_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createAcceptedEvent;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createContractRequest;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createTermination;
@@ -50,8 +50,7 @@ public class ConsumerActions {
         try (var response = postJson(url, contractRequest)) {
             // get the response and update the negotiation with the provider process id
             checkResponse(response);
-            assert response.body() != null;
-            var jsonResponse = processJsonLd(response.body().byteStream());
+            var jsonResponse = MessageSerializer.expandAndDeserialize(response.body().byteStream());
             var providerId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, jsonResponse);
             negotiation.setCorrelationId(providerId, REQUESTED);
         }

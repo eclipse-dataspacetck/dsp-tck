@@ -35,7 +35,7 @@ public class AbstractDspPipeline<P extends AsyncPipeline<P>> extends AbstractAsy
         expectLatches.add(latch);
         stages.add(() ->
                 endpoint.registerHandler(path, agreement -> {
-                    action.accept((MessageSerializer.processJsonLd(agreement)));
+                    action.accept((MessageSerializer.expandAndDeserialize(agreement)));
                     endpoint.deregisterHandler(path);
                     latch.countDown();
                     return null;

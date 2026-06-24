@@ -18,6 +18,7 @@ import org.eclipse.dataspacetck.core.api.system.CallbackEndpoint;
 import org.eclipse.dataspacetck.core.spi.boot.Monitor;
 import org.eclipse.dataspacetck.dsp.system.api.connector.Connector;
 import org.eclipse.dataspacetck.dsp.system.api.connector.NegotiationListener;
+import org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer;
 import org.eclipse.dataspacetck.dsp.system.api.pipeline.ConsumerNegotiationPipeline;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation;
 import org.eclipse.dataspacetck.dsp.system.api.statemachine.ContractNegotiation.State;
@@ -34,7 +35,7 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPAC
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.TCK_PARTICIPANT_ID;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.expandAndDeserialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.serialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createAgreement;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createFinalizedEvent;
@@ -153,11 +154,11 @@ public class ConsumerNegotiationPipelineImpl extends AbstractNegotiationPipeline
         expectLatches.add(latch);
         stages.add(() ->
                 endpoint.registerHandler(REQUEST_INITIAL_PATH, event -> {
-                    var expanded = processJsonLd(event);
+                    var expanded = MessageSerializer.expandAndDeserialize(event);
                     var negotiation = action.apply(expanded, consumerConnectorId);
                     endpoint.deregisterHandler(REQUEST_INITIAL_PATH);
                     latch.countDown();
-                    return serialize(processJsonLd(negotiation));
+                    return serialize(expandAndDeserialize(negotiation));
                 }));
         return this;
     }
@@ -168,11 +169,11 @@ public class ConsumerNegotiationPipelineImpl extends AbstractNegotiationPipeline
         expectLatches.add(latch);
         stages.add(() ->
                 endpoint.registerHandler(REQUEST_PATH, event -> {
-                    var expanded = processJsonLd(event);
+                    var expanded = MessageSerializer.expandAndDeserialize(event);
                     var negotiation = action.apply(expanded, consumerConnectorId);
                     endpoint.deregisterHandler(REQUEST_PATH);
                     latch.countDown();
-                    return serialize(processJsonLd(negotiation));
+                    return serialize(expandAndDeserialize(negotiation));
                 }));
         return this;
     }
@@ -203,7 +204,7 @@ public class ConsumerNegotiationPipelineImpl extends AbstractNegotiationPipeline
         expectLatches.add(latch);
         stages.add(() ->
                 endpoint.registerHandler(path, event -> {
-                    var expanded = processJsonLd(event);
+                    var expanded = MessageSerializer.expandAndDeserialize(event);
                     action.accept(expanded);
                     endpoint.deregisterHandler(path);
                     latch.countDown();

@@ -33,7 +33,7 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPAC
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.DSPACE_PROPERTY_STATE_EXPANDED;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.TCK_PARTICIPANT_ID;
 import static org.eclipse.dataspacetck.dsp.system.api.message.JsonLdFunctions.stringIdProperty;
-import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.processJsonLd;
+import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.expandAndDeserialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.serialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createAcceptedEvent;
 import static org.eclipse.dataspacetck.dsp.system.api.message.NegotiationFunctions.createContractRequest;
@@ -150,7 +150,7 @@ public class ProviderNegotiationPipelineImpl extends AbstractNegotiationPipeline
         expectLatches.add(latch);
         stages.add(() ->
                 endpoint.registerHandler(NEGOTIATIONS_OFFER_PATH, offer -> {
-                    var negotiation = action.apply((processJsonLd(offer)));
+                    var negotiation = action.apply(expandAndDeserialize(offer));
                     endpoint.deregisterHandler(NEGOTIATIONS_OFFER_PATH);
                     latch.countDown();
                     return serialize(negotiation);
