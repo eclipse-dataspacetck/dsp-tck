@@ -24,7 +24,6 @@ plugins {
     jacoco
     `jacoco-report-aggregation`
     alias(libs.plugins.docker)
-    alias(libs.plugins.nexuspublishing)
     alias(libs.plugins.tck.build) apply false
     alias(libs.plugins.tck.generator) apply false
 }
