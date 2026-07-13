@@ -54,6 +54,15 @@ public class HttpFunctions {
     }
 
     public static Response postJson(String url, Object message, boolean expectError, boolean plain) {
+        return postJson(url, message, expectError, plain, authorizationInterceptor);
+    }
+
+    public static Response postJson(String url, Object message, boolean expectError, Interceptor interceptor) {
+        return postJson(url, message, expectError, false, interceptor);
+    }
+
+    public static Response postJson(String url, Object message, boolean expectError, boolean plain, Interceptor interceptor) {
+        var interceptorToUse = interceptor != null ? interceptor : authorizationInterceptor;
         var serialized = plain ? serializePlainJson(message) : serialize(message);
         var requestBody = RequestBody.create(serialized, MediaType.get("application/json"));
         var httpRequest = new Request.Builder()
@@ -61,7 +70,7 @@ public class HttpFunctions {
                 .post(requestBody)
                 .build();
 
-        var httpClient = new OkHttpClient.Builder().addInterceptor(authorizationInterceptor).build();
+        var httpClient = new OkHttpClient.Builder().addInterceptor(interceptorToUse).build();
         int maxRetries = 3;
         int attempt = 0;
         long backoff = 200; // initial backoff in ms
@@ -102,6 +111,10 @@ public class HttpFunctions {
     }
 
     public static Response getJson(String url, boolean expectError) {
+        return getJson(url, expectError, null);
+    }
+
+    public static Response getJson(String url, boolean expectError, Interceptor interceptor) {
         var httpRequest = new Request.Builder()
                 .url(url)
                 .get()

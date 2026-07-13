@@ -22,13 +22,17 @@ import java.util.Map;
  */
 public interface CatalogClient {
 
+    default Map<String, Object> getCatalog(Map<String, Object> message) {
+        return getCatalog(message, false);
+    }
+
     /**
      * Retrieves the catalog.
      *
      * @param message a map containing parameters for the request
      * @return a map representing the catalog
      */
-    Map<String, Object> getCatalog(Map<String, Object> message);
+    Map<String, Object> getCatalog(Map<String, Object> message, boolean expectError);
 
     /**
      * Retrieves a specific dataset by its ID.

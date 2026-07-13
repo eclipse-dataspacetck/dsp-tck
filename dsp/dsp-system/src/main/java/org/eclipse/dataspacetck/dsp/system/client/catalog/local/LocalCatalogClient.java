@@ -36,9 +36,12 @@ public class LocalCatalogClient implements CatalogClient {
     }
 
     @Override
-    public Map<String, Object> getCatalog(Map<String, Object> message) {
+    public Map<String, Object> getCatalog(Map<String, Object> message, boolean expectError) {
         var catalog = connector.getCatalogManager().getCatalog();
-        return expandAndDeserialize(createCatalogResponse(catalog));
+        if (catalog != null && !expectError) {
+            return expandAndDeserialize(createCatalogResponse(catalog));
+        }
+        return expandAndDeserialize(createCatalogErrorResponse("401"));
     }
 
     @Override
