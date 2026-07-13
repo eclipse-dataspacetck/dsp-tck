@@ -152,6 +152,10 @@ public class DspSystemLauncher implements SystemLauncher {
         }
     }
 
+    public String getConnectorProtocolUrl() {
+        return connectorProtocolUrl;
+    }
+
     @Override
     public <T> boolean providesService(Class<T> type) {
         return type.equals(ProviderNegotiationClient.class) ||
