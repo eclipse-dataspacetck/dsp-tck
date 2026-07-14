@@ -28,12 +28,16 @@ import java.util.function.Function;
  */
 public interface ProviderNegotiationPipeline extends NegotiationPipeline<ProviderNegotiationPipeline> {
 
-    ProviderNegotiationPipeline sendRequestMessage(String datasetId, String offerId);
+    default ProviderNegotiationPipeline sendRequestMessage(String datasetId, String offerId) {
+        return sendRequestMessage(datasetId, offerId, false);
+    }
+
+    ProviderNegotiationPipeline sendRequestMessage(String datasetId, String offerId, boolean expectError);
 
     ProviderNegotiationPipeline sendCounterOfferMessage(String offerId, String targetId);
 
     ProviderNegotiationPipeline sendCounterOfferMessage(String offerId, String targetId, boolean expectError);
-    
+
     ProviderNegotiationPipeline acceptLastOffer();
 
     ProviderNegotiationPipeline sendVerifiedEvent();

@@ -23,6 +23,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.util.function.Supplier;
 
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.serialize;
 import static org.eclipse.dataspacetck.dsp.system.api.message.MessageSerializer.serializePlainJson;
@@ -41,6 +42,15 @@ public class HttpFunctions {
             var request = chain.request();
             var authenticatedRequest = request.newBuilder()
                     .header("Authorization", authorizationHeader).build();
+            return chain.proceed(authenticatedRequest);
+        };
+    }
+
+    public static void registerAuthorizationInterceptor(Supplier<String> authorizationHeaderProvider) {
+        authorizationInterceptor = chain -> {
+            var request = chain.request();
+            var authenticatedRequest = request.newBuilder()
+                    .header("Authorization", authorizationHeaderProvider.get()).build();
             return chain.proceed(authenticatedRequest);
         };
     }

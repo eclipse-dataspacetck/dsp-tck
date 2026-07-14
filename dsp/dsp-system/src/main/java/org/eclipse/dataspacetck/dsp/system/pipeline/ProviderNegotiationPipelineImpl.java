@@ -72,16 +72,20 @@ public class ProviderNegotiationPipelineImpl extends AbstractNegotiationPipeline
     }
 
     @SuppressWarnings("unused")
-    public ProviderNegotiationPipeline sendRequestMessage(String datasetId, String offerId) {
+    public ProviderNegotiationPipeline sendRequestMessage(String datasetId, String offerId, boolean expectError) {
         stages.add(() -> {
             providerNegotiation = consumerConnector.getConsumerNegotiationManager().createNegotiation(datasetId, offerId, providerBaseUrl);
 
             var contractRequest = createContractRequest(providerNegotiation.getId(), offerId, datasetId, endpoint.getAddress());
 
             monitor.debug("Sending contract request");
-            var response = negotiationClient.contractRequest(contractRequest, providerConnectorId, false);
-            var correlationId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, response);
-            consumerConnector.getConsumerNegotiationManager().contractRequested(providerNegotiation.getId(), correlationId);
+            var response = negotiationClient.contractRequest(contractRequest, providerConnectorId, expectError);
+
+            if (!expectError) {
+                var correlationId = stringIdProperty(DSPACE_PROPERTY_PROVIDER_PID_EXPANDED, response);
+                consumerConnector.getConsumerNegotiationManager().contractRequested(providerNegotiation.getId(), correlationId);
+            }
+
         });
         return this;
     }
