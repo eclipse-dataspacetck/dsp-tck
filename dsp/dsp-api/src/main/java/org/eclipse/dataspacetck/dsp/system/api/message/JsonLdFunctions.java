@@ -24,7 +24,7 @@ import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.ID;
 import static org.eclipse.dataspacetck.dsp.system.api.message.DspConstants.VALUE;
 
 public class JsonLdFunctions {
-    
+
     private static final Map<String, String> IDENTITY_TYPE = Map.of("@type", "@id");
 
     public static Map<String, Object> mapProperty(String key, Map<String, Object> map) {
@@ -61,15 +61,29 @@ public class JsonLdFunctions {
     }
 
     public static String stringProperty(String key, Map<String, Object> map) {
-        return stringProperty(key, VALUE, map);
+        return stringProperty(key, map, false);
+    }
+
+    public static String stringProperty(String key, Map<String, Object> map, boolean optional) {
+        return stringProperty(key, VALUE, map, optional);
     }
 
     public static String stringIdProperty(String key, Map<String, Object> map) {
-        return stringProperty(key, ID, map);
+        return stringProperty(key, ID, map, false);
     }
 
     public static String stringProperty(String key, String valKey, Map<String, Object> map) {
-        var untypedValue = requireNonNull(map.get(key), "No value for: " + key);
+        return stringProperty(key, valKey, map, false);
+    }
+
+    public static String stringProperty(String key, String valKey, Map<String, Object> map, boolean optional) {
+        var untypedValue = map.get(key);
+        if (untypedValue == null) {
+            if (optional) {
+                return null;
+            }
+            throw new AssertionError(format("Property '%s' was not found", key));
+        }
         //noinspection rawtypes
         if (untypedValue instanceof List valueList) {
             if (valueList.isEmpty()) {
