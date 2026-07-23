@@ -19,18 +19,18 @@ import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdOptions;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jsonp.JSONPModule;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.eclipse.dataspacetck.core.api.message.MessageValidator;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
+import tools.jackson.datatype.jsonp.JSONPModule;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
@@ -63,15 +63,10 @@ public class MessageSerializer {
     private static final String JSONLD_PREFIX = "dataspacetck.dsp.jsonld.context.";
 
     static {
-        MAPPER = new ObjectMapper();
-        MAPPER.registerModule(new JSONPModule());
-        var module = new SimpleModule() {
-            @Override
-            public void setupModule(SetupContext context) {
-                super.setupModule(context);
-            }
-        };
-        MAPPER.registerModule(module);
+        MAPPER = JsonMapper.builder()
+                .addModule(new JSONPModule())
+                .addModule(new SimpleModule())
+                .build();
         CONTEXTS = new HashMap<>();
         registerDocument(URI.create("https://w3id.org/dspace/2025/1/context.jsonld"), "dsp-2025-1.jsonld");
         registerDocument(URI.create("https://w3id.org/dspace/2025/1/odrl-profile.jsonld"), "dsp-2025-1-odrl-profile.jsonld");
@@ -94,7 +89,7 @@ public class MessageSerializer {
             validateMessage(compacted);
 
             return MAPPER.writeValueAsString(compacted);
-        } catch (JsonProcessingException | JsonLdError e) {
+        } catch (JsonLdError e) {
             throw new RuntimeException(e);
         }
     }
@@ -102,16 +97,15 @@ public class MessageSerializer {
     public static String serializePlainJson(Object object) {
         try {
             return MAPPER.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @SuppressWarnings("unchecked")
     public static <T> T deserialize(InputStream stream, Class<T> type) {
         try {
             return MAPPER.readValue(stream, type);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new AssertionError("Cannot deserialize json: " + e.getMessage(), e);
         }
     }
