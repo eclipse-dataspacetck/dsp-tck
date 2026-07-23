@@ -5,10 +5,6 @@ maven/mavencentral/com.apicatalog/titanium-json-ld/1.7.0, Apache-2.0, approved, 
 maven/mavencentral/com.apicatalog/titanium-rdf-api/1.0.0, Apache-2.0, approved, #20245
 maven/mavencentral/com.apicatalog/titanium-rdf-n-quads/1.0.2, Apache-2.0, approved, #20243
 maven/mavencentral/com.fasterxml.jackson.core/jackson-annotations/2.22, Apache-2.0, approved, #28540
-maven/mavencentral/com.fasterxml.jackson.core/jackson-core/2.22.1, MIT AND BSD-2-Clause AND BSL-1.0 AND Apache-2.0, approved, #28625
-maven/mavencentral/com.fasterxml.jackson.core/jackson-databind/2.22.1, Apache-2.0, approved, #28621
-maven/mavencentral/com.fasterxml.jackson.datatype/jackson-datatype-jakarta-jsonp/2.22.1, Apache-2.0, approved, #29009
-maven/mavencentral/com.fasterxml.jackson/jackson-bom/2.22.1, Apache-2.0, approved, #28982
 maven/mavencentral/com.github.librepdf/openpdf/3.0.5, Apache-2.0 AND MPL-1.1 OR LGPL-2.0-or-later AND BSD-3-Clause-No-Nuclear-Warranty AND LicenseRef-scancode-adobe-postscript AND LicenseRef-Permission-Notice-Paulo-Soares AND MPL-2.0 OR LGPL-2.1-or-later AND OFL-1.1, approved, #23389
 maven/mavencentral/com.google.code.findbugs/jsr305/3.0.2, Apache-2.0 and CC-BY-2.5, approved, #15220
 maven/mavencentral/com.google.errorprone/error_prone_annotations/2.36.0, Apache-2.0, approved, #18702
@@ -59,8 +55,8 @@ maven/mavencentral/org.codehaus.plexus/plexus-component-annotations/2.1.0, Apach
 maven/mavencentral/org.codehaus.plexus/plexus-container-default/2.1.0, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.codehaus.plexus/plexus-utils/3.1.1, , approved, CQ16492
 maven/mavencentral/org.codehaus.plexus/plexus-utils/3.3.0, , approved, CQ21066
-maven/mavencentral/org.eclipse.dataspacetck.common/core-api/1.2.3, Apache-2.0, approved, technology.dataspacetck
-maven/mavencentral/org.eclipse.dataspacetck.common/test-plan-generator/1.2.3, Apache-2.0, approved, technology.dataspacetck
+maven/mavencentral/org.eclipse.dataspacetck.common/core-api/1.3.0, Apache-2.0, approved, technology.dataspacetck
+maven/mavencentral/org.eclipse.dataspacetck.common/test-plan-generator/1.3.0, Apache-2.0, approved, technology.dataspacetck
 maven/mavencentral/org.eclipse.elk/org.eclipse.elk.alg.common/0.10.0, EPL-2.0 OR GPL-3.0-only, approved, modeling.elk
 maven/mavencentral/org.eclipse.elk/org.eclipse.elk.alg.layered/0.10.0, EPL-2.0 OR GPL-3.0-only, approved, modeling.elk
 maven/mavencentral/org.eclipse.elk/org.eclipse.elk.alg.mrtree/0.10.0, EPL-2.0 OR GPL-3.0-only, approved, modeling.elk
@@ -80,25 +76,15 @@ maven/mavencentral/org.jetbrains.kotlin/kotlin-stdlib/2.1.21, Apache-2.0, approv
 maven/mavencentral/org.jetbrains.kotlin/kotlin-stdlib/2.2.21, Apache-2.0, approved, #22410
 maven/mavencentral/org.jetbrains/annotations/13.0, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.jspecify/jspecify/1.0.0, Apache-2.0, approved, #21897
-maven/mavencentral/org.junit.jupiter/junit-jupiter-api/6.1.1, EPL-2.0, approved, #28330
 maven/mavencentral/org.junit.jupiter/junit-jupiter-api/6.1.2, EPL-2.0, approved, #28330
-maven/mavencentral/org.junit.jupiter/junit-jupiter-engine/6.1.1, EPL-2.0, approved, #28334
 maven/mavencentral/org.junit.jupiter/junit-jupiter-engine/6.1.2, EPL-2.0, approved, #28334
-maven/mavencentral/org.junit.jupiter/junit-jupiter-params/6.1.1, EPL-2.0, approved, #28329
 maven/mavencentral/org.junit.jupiter/junit-jupiter-params/6.1.2, EPL-2.0, approved, #28329
-maven/mavencentral/org.junit.jupiter/junit-jupiter/6.1.1, EPL-2.0, approved, #28999
 maven/mavencentral/org.junit.jupiter/junit-jupiter/6.1.2, EPL-2.0, approved, #28999
-maven/mavencentral/org.junit.platform/junit-platform-commons/6.1.1, EPL-2.0, approved, #28333
 maven/mavencentral/org.junit.platform/junit-platform-commons/6.1.2, EPL-2.0, approved, #28333
-maven/mavencentral/org.junit.platform/junit-platform-engine/6.1.1, EPL-2.0, approved, #28327
 maven/mavencentral/org.junit.platform/junit-platform-engine/6.1.2, EPL-2.0, approved, #28327
-maven/mavencentral/org.junit.platform/junit-platform-launcher/6.1.1, EPL-2.0, approved, #28331
 maven/mavencentral/org.junit.platform/junit-platform-launcher/6.1.2, EPL-2.0, approved, #28331
-maven/mavencentral/org.junit.platform/junit-platform-suite-api/6.1.1, EPL-2.0, approved, #28332
 maven/mavencentral/org.junit.platform/junit-platform-suite-api/6.1.2, EPL-2.0, approved, #28332
-maven/mavencentral/org.junit.platform/junit-platform-suite-engine/6.1.1, EPL-2.0, approved, #28325
 maven/mavencentral/org.junit.platform/junit-platform-suite-engine/6.1.2, EPL-2.0, approved, #28325
-maven/mavencentral/org.junit/junit-bom/6.1.1, EPL-2.0, approved, #28991
 maven/mavencentral/org.junit/junit-bom/6.1.2, EPL-2.0, approved, #28991
 maven/mavencentral/org.mockito/mockito-core/5.23.0, MIT AND (Apache-2.0 AND MIT) AND Apache-2.0, approved, #26529
 maven/mavencentral/org.objenesis/objenesis/3.3, Apache-2.0, approved, #19727
@@ -111,3 +97,7 @@ maven/mavencentral/org.scilab.forge/jlatexmath-font-cyrillic/1.0.7, NOASSERTION,
 maven/mavencentral/org.scilab.forge/jlatexmath-font-greek/1.0.7, GPL-2.0, restricted, clearlydefined
 maven/mavencentral/org.scilab.forge/jlatexmath/1.0.7, GPL-2.0 AND GPL-2.0-only, restricted, clearlydefined
 maven/mavencentral/org.xmlresolver/xmlresolver/5.2.2, Apache-2.0, approved, #19677
+maven/mavencentral/tools.jackson.core/jackson-core/3.2.1, , restricted, clearlydefined
+maven/mavencentral/tools.jackson.core/jackson-databind/3.2.1, , restricted, clearlydefined
+maven/mavencentral/tools.jackson.datatype/jackson-datatype-jakarta-jsonp/3.2.1, , restricted, clearlydefined
+maven/mavencentral/tools.jackson/jackson-bom/3.2.1, Apache-2.0, approved, #29716
