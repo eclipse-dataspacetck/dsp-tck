@@ -108,7 +108,7 @@ maven/mavencentral/org.scilab.forge/jlatexmath-font-cyrillic/1.0.7, NOASSERTION,
 maven/mavencentral/org.scilab.forge/jlatexmath-font-greek/1.0.7, GPL-2.0, restricted, clearlydefined
 maven/mavencentral/org.scilab.forge/jlatexmath/1.0.7, GPL-2.0 AND GPL-2.0-only, restricted, clearlydefined
 maven/mavencentral/org.xmlresolver/xmlresolver/5.2.2, Apache-2.0, approved, #19677
-maven/mavencentral/tools.jackson.core/jackson-core/3.2.1, , restricted, clearlydefined
-maven/mavencentral/tools.jackson.core/jackson-databind/3.2.1, , restricted, clearlydefined
-maven/mavencentral/tools.jackson.datatype/jackson-datatype-jakarta-jsonp/3.2.1, , restricted, clearlydefined
-maven/mavencentral/tools.jackson/jackson-bom/3.2.1, Apache-2.0, approved, #29716
+maven/mavencentral/tools.jackson.core/jackson-core/3.2.2, , restricted, clearlydefined
+maven/mavencentral/tools.jackson.core/jackson-databind/3.2.2, , restricted, clearlydefined
+maven/mavencentral/tools.jackson.datatype/jackson-datatype-jakarta-jsonp/3.2.2, , restricted, clearlydefined
+maven/mavencentral/tools.jackson/jackson-bom/3.2.2, Apache-2.0, approved, #29716
