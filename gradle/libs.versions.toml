@@ -12,7 +12,7 @@ okhttp = "5.5.0"
 mockito = "5.23.0"
 tck = "1.3.0"
 titanium = "1.7.0"
-schema-validator = "3.0.6"
+schema-validator = "3.0.7"
 
 [libraries]
 
