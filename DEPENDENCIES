@@ -71,10 +71,10 @@ maven/mavencentral/org.eclipse.emf/org.eclipse.emf.ecore.xmi/2.12.0, EPL-2.0, ap
 maven/mavencentral/org.eclipse.emf/org.eclipse.emf.ecore/2.12.0, EPL-2.0, approved, modeling.emf
 maven/mavencentral/org.eclipse.parsson/parsson/1.1.9, EPL-2.0, approved, ee4j.parsson
 maven/mavencentral/org.hamcrest/hamcrest/2.1, BSD-3-Clause, approved, clearlydefined
-maven/mavencentral/org.jacoco/org.jacoco.agent/0.8.14, EPL-2.0, approved, CQ23285
-maven/mavencentral/org.jacoco/org.jacoco.ant/0.8.14, EPL-2.0, approved, #1068
-maven/mavencentral/org.jacoco/org.jacoco.core/0.8.14, EPL-2.0, approved, CQ23283
-maven/mavencentral/org.jacoco/org.jacoco.report/0.8.14, EPL-2.0 AND Apache-2.0, approved, CQ23284
+maven/mavencentral/org.jacoco/org.jacoco.agent/0.8.15, EPL-2.0, approved, CQ23285
+maven/mavencentral/org.jacoco/org.jacoco.ant/0.8.15, EPL-2.0, approved, #1068
+maven/mavencentral/org.jacoco/org.jacoco.core/0.8.15, EPL-2.0, approved, CQ23283
+maven/mavencentral/org.jacoco/org.jacoco.report/0.8.15, EPL-2.0 AND Apache-2.0, approved, CQ23284
 maven/mavencentral/org.javassist/javassist/3.28.0-GA, Apache-2.0 OR LGPL-2.1-or-later OR MPL-1.1, approved, #327
 maven/mavencentral/org.jetbrains.kotlin/kotlin-stdlib/2.1.21, Apache-2.0, approved, #17634
 maven/mavencentral/org.jetbrains.kotlin/kotlin-stdlib/2.2.21, Apache-2.0, approved, #22410
@@ -101,12 +101,12 @@ maven/mavencentral/org.junit.platform/junit-platform-suite-engine/6.1.2, EPL-2.0
 maven/mavencentral/org.junit.platform/junit-platform-suite-engine/6.1.3, EPL-2.0, approved, #28325
 maven/mavencentral/org.junit/junit-bom/6.1.2, EPL-2.0, approved, #28991
 maven/mavencentral/org.junit/junit-bom/6.1.3, EPL-2.0, approved, #28991
-maven/mavencentral/org.mockito/mockito-core/5.23.0, MIT AND (Apache-2.0 AND MIT) AND Apache-2.0, approved, #26529
+maven/mavencentral/org.mockito/mockito-core/5.24.0, (Apache-2.0 AND MIT), approved, #31422
 maven/mavencentral/org.objenesis/objenesis/3.3, Apache-2.0, approved, #19727
 maven/mavencentral/org.opentest4j/opentest4j/1.3.0, Apache-2.0, approved, #9713
-maven/mavencentral/org.ow2.asm/asm-commons/9.9, BSD-3-Clause, approved, #23949
-maven/mavencentral/org.ow2.asm/asm-tree/9.9, BSD-3-Clause, approved, #23950
-maven/mavencentral/org.ow2.asm/asm/9.9, BSD-3-Clause, approved, #23946
+maven/mavencentral/org.ow2.asm/asm-commons/9.10.1, BSD-3-Clause, approved, #28390
+maven/mavencentral/org.ow2.asm/asm-tree/9.10.1, BSD-3-Clause, approved, #28389
+maven/mavencentral/org.ow2.asm/asm/9.10.1, BSD-3-Clause, approved, #28386
 maven/mavencentral/org.reflections/reflections/0.10.2, Apache-2.0 AND WTFPL, approved, clearlydefined
 maven/mavencentral/org.scilab.forge/jlatexmath-font-cyrillic/1.0.7, NOASSERTION, restricted, clearlydefined
 maven/mavencentral/org.scilab.forge/jlatexmath-font-greek/1.0.7, GPL-2.0, restricted, clearlydefined
