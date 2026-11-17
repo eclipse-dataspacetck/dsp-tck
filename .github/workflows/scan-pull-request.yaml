@@ -24,4 +24,8 @@ on:
 
 jobs:
   scan:
+    # the reusable workflow reads the PR labels through the API; a called workflow
+    # can't be granted more permissions than the caller passes down
+    permissions:
+      pull-requests: read
     uses: eclipse-dataspacetck/.github/.github/workflows/scan-pull-request.yaml@main
