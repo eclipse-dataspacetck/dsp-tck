@@ -9,7 +9,7 @@
  *
  *  Contributors:
  *       Bayerische Motoren Werke Aktiengesellschaft (BMW AG) - initial API and implementation
- *
+ *       Metaform Systems, Inc. - retry requests answered with 503 Service Unavailable
  *
  */
 
@@ -88,7 +88,7 @@ public class HttpFunctions {
         while (true) {
             try {
                 var response = httpClient.newCall(httpRequest).execute();
-                if (!expectError && response.code() != 404 && response.code() >= 400 && response.code() < 500 && attempt < maxRetries - 1) {
+                if (isRetryable(response, expectError) && attempt < maxRetries - 1) {
                     attempt++;
                     response.close();
                     try {
@@ -114,6 +114,24 @@ public class HttpFunctions {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    /**
+     * Whether a request should be sent again:
+     * <ul>
+     *     <li>{@code 503 Service Unavailable}: the connector under test can't process the message yet, e.g. because
+     *     the message arrived before the connector received the acknowledgement of its own preceding message. The
+     *     request is sent again, also when an error is expected, so that the final answer is checked;</li>
+     *     <li>a client error other than {@code 404}, when no error is expected, for connectors that answer such a
+     *     message with a client error.</li>
+     * </ul>
+     */
+    private static boolean isRetryable(Response response, boolean expectError) {
+        var code = response.code();
+        if (code == 503) {
+            return true;
+        }
+        return !expectError && code != 404 && code >= 400 && code < 500;
     }
 
     public static Response getJson(String url) {
